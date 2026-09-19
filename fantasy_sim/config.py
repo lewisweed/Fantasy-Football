@@ -130,8 +130,13 @@ class SeasonConfig:
 
 
 SEASON_CONFIG = {
+    # Round-1 rules are read off that season's real ADP board, not assumed.
+    # 2023 is the one that matters: Travis Kelce went at pick 5.9, so a tight
+    # end in round 1 was ordinary rather than a reach.  In 2024 and 2025 the
+    # first tight end went at 24.4 and 27.1, which is round 3.
+    2023: SeasonConfig(year=2023, round1_positions=(RB, WR, TE)),
+    2024: SeasonConfig(year=2024),
     2025: SeasonConfig(year=2025),
-    # 2024 / 2023 slot in here once their persona research is done.
 }
 
 

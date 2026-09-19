@@ -76,8 +76,8 @@ def _pa_points(points_allowed: np.ndarray) -> np.ndarray:
 
 def score_dst(team_week: pd.DataFrame, games: pd.DataFrame) -> pd.DataFrame:
     """Weekly D/ST scoring.  Returns columns ``team, week, points``."""
-    t = team_week.copy()
-    t = t[t["season_type"] == "REG"]
+    from .clean import regular_season_rows
+    t = regular_season_rows(team_week).copy()
 
     # Points allowed comes from the box score, not the defensive stat lines.
     home = games[["season", "week", "home_team", "away_score"]].rename(
@@ -105,7 +105,8 @@ def score_dst(team_week: pd.DataFrame, games: pd.DataFrame) -> pd.DataFrame:
 
 def score_player_week(player_week: pd.DataFrame) -> pd.DataFrame:
     """Offense + kickers from a weekly player-stats frame (REG only)."""
-    df = player_week[player_week["season_type"] == "REG"].copy()
+    from .clean import regular_season_rows
+    df = regular_season_rows(player_week).copy()
     is_k = df["position"].eq("K")
     pts = score_offense(df)
     pts = pts.where(~is_k, score_kicker(df))

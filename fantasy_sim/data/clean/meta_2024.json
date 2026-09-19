@@ -1,0 +1,9 @@
+{
+  "year": 2024,
+  "n_players": 667,
+  "n_weeks": 17,
+  "tier": "espn+ffc",
+  "espn_file_present": true,
+  "ffc_file_present": true,
+  "calibration_years": []
+}

@@ -79,6 +79,18 @@ def fix_team(s):
 # --------------------------------------------------------------------------
 # Calendar: map a ranking scrape date onto a fantasy week
 # --------------------------------------------------------------------------
+def regular_season_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """Regular-season rows, whichever column this vintage of the file uses.
+
+    nflverse renamed ``game_type`` to ``season_type`` partway through: older
+    seasons carry only the former, recent ones carry both.
+    """
+    for col in ("season_type", "game_type"):
+        if col in df.columns:
+            return df[df[col] == "REG"]
+    return df
+
+
 def week_calendar(games: pd.DataFrame, year: int) -> pd.DataFrame:
     g = games[(games.season == year) & (games.game_type == "REG")].copy()
     g["gameday"] = pd.to_datetime(g["gameday"])
@@ -285,8 +297,7 @@ def availability(year: int, gsis: pd.Series, teams: pd.Series, n_weeks: int,
     quest = np.zeros((n, n_weeks), dtype=bool)
     idx = {g: i for i, g in enumerate(gsis) if isinstance(g, str) and g}
 
-    inj = pd.read_csv(fetch.injuries(year), low_memory=False)
-    inj = inj[inj.season_type == "REG"]
+    inj = regular_season_rows(pd.read_csv(fetch.injuries(year), low_memory=False))
     for gid, wk, st in zip(inj.gsis_id, inj.week, inj.report_status):
         i = idx.get(gid)
         if i is None or not (1 <= wk <= n_weeks):
@@ -303,7 +314,7 @@ def availability(year: int, gsis: pd.Series, teams: pd.Series, n_weeks: int,
     except Exception:
         wr = None
     if wr is not None:
-        wr = wr[wr.game_type == "REG"].dropna(subset=["gsis_id"])
+        wr = regular_season_rows(wr).dropna(subset=["gsis_id"])
         # UNAVAILABLE: injured reserve, cut, retired, exempt list.
         bad = {"RES", "CUT", "RET", "EXE", "TRC"}
         seen = np.zeros((n, n_weeks), dtype=bool)
@@ -451,15 +462,38 @@ def espn_pool(year: int, n_weeks: int):
     pool["nname"] = pool["player"].map(norm_name)
     # D/ST are named for the franchise, so they match on team, not on name.
     pool.loc[pool.pos == "DST", "nname"] = pool.loc[pool.pos == "DST", "team"]
-    # A player ESPN never gave a preseason number sits at the bottom of his
-    # position rather than at zero: nobody expected anything of him, but "not
-    # rated" is not the same as "cannot score".
+
+    proj_arr = np.stack(projs) if projs else np.zeros((0, n_weeks))
+    act_arr = np.stack(acts) if acts else np.zeros((0, n_weeks))
+    seen_arr = np.stack(present) if present else np.zeros((0, n_weeks), dtype=bool)
+
     prior = (pool["season_proj"] / n_weeks).to_numpy(copy=True)
+    # Where ESPN published no season-long number -- every 2023 defence, for
+    # instance -- a player's own published weekly projections say the same
+    # thing, since the prior is a per-game expectation to begin with.
+    missing = prior <= 0
+    if missing.any() and len(proj_arr):
+        weekly = np.where(proj_arr > 0, proj_arr, np.nan)
+        with np.errstate(invalid="ignore"):
+            mean_weekly = np.nanmean(
+                np.where(np.isnan(weekly).all(axis=1, keepdims=True), 0.0, weekly), axis=1)
+        prior = np.where(missing & np.isfinite(mean_weekly) & (mean_weekly > 0),
+                         mean_weekly, prior)
+    # Anyone still unrated sits at the bottom of his position rather than at
+    # zero: nobody expected anything of him, but "not rated" is not "cannot
+    # score".  Token projections make a poor floor, so it is taken from the
+    # players carrying a real one.
     for pos in pool.pos.unique():
         at = (pool.pos == pos).to_numpy()
+        real = prior[at & (prior >= 1.0)]
         rated = prior[at & (prior > 0)]
-        if len(rated):
-            prior[at & (prior <= 0)] = float(np.percentile(rated, 10))
+        if len(real):
+            floor = 0.4 * float(np.median(real))
+        elif len(rated):
+            floor = float(np.median(rated))
+        else:
+            continue
+        prior[at & (prior < floor)] = floor
     pool["prior_ppg"] = prior
 
     # -- ADP: real mock drafts first, ESPN's own board as the fallback ----
@@ -486,9 +520,7 @@ def espn_pool(year: int, n_weeks: int):
     pool.loc[miss, "adp"] = last + pool.loc[miss, "espn_rank"].rank(method="first")
     pool["adp"] = pool["adp"].fillna(last + len(pool))
 
-    return (pool, np.stack(projs) if projs else np.zeros((0, n_weeks)),
-            np.stack(acts) if acts else np.zeros((0, n_weeks)),
-            np.stack(present) if present else np.zeros((0, n_weeks), dtype=bool))
+    return pool, proj_arr, act_arr, seen_arr
 
 
 def repair_projections(proj_raw: np.ndarray, act_present: np.ndarray,
