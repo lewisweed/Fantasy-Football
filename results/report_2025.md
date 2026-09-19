@@ -234,7 +234,7 @@ That sets the ceiling on what any of these tables can do for one league. Ranking
 
 **The mistake is the early reach, not the timing after it.** The counterfactual in section 5 is the load-bearing version of this, because it replays the same league seed with one team forced into a round and compares it against that same team's own default. Forcing a quarterback in rounds 2 and 3 costs 18 and 12 season points. Every round from 4 to 12 is worth between +5 and +17 instead, peaking around round 5 -- a band, not a trend. The raw table in section 3 looks more like 'later is better' only because the personas that reach early are worse in other ways too.
 
-**No quarterback taken in the first five rounds paid for himself.** The best of them, Josh Allen, still came in at 7.28% -- under the 8.33% a team gets for turning up. Drake Maye did the most for the teams that took him, at a fraction of the cost. Section 4 prices each one.
+**No quarterback taken in the first five rounds paid for himself.** The best of them, Josh Allen, still returned 7.28% -- below the 8.33% an average team wins by default, since twelve teams share one title a year. Drake Maye did the most for the teams that took him, at a fraction of the cost. Section 4 prices each one against what he cost.
 
 **Attention beat every draft strategy.** Active managers won 9.45% of titles against 4.61% for lazy ones, and the gap in season points is larger still. It comes entirely from in-season work.
 

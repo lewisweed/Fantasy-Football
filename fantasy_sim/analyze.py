@@ -523,11 +523,13 @@ def summary(year: int, teams: pd.DataFrame, pool: pd.DataFrame, tier: str) -> st
 
     if best_early is not None:
         lines += [
-            f"**No quarterback taken in the first five rounds paid for himself.** "
-            f"The best of them, {best_early}, still came in at "
-            f"{pct(float(early.t.max()))} -- under the 8.33% a team gets for "
-            f"turning up. {best_qb} did the most for the teams that took him, "
-            "at a fraction of the cost. Section 4 prices each one.",
+            f"**No quarterback taken in the first five rounds paid for "
+            f"himself.** The best of them, {best_early}, still returned "
+            f"{pct(float(early.t.max()))} -- below the {pct(FAIR_SHARE)} an "
+            "average team wins by default, since twelve teams share one title "
+            "a year. {qb} did the most for the teams that took him, at a "
+            "fraction of the cost. Section 4 prices each one against what he "
+            "cost.".replace("{qb}", best_qb),
             "",
         ]
 
