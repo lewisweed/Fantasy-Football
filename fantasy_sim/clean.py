@@ -513,12 +513,18 @@ def espn_pool(year: int, n_weeks: int):
         pool.loc[take, "adp"] = dmerge.loc[take, "adp_d"].to_numpy()
         pool.loc[take, "adp_sd"] = dmerge.loc[take, "stdev"].to_numpy()
 
-    # Everyone Fantasy Football Calculator never saw drafted is priced off
-    # ESPN's own PPR board, shifted past the last real ADP.
+    # Everyone Fantasy Football Calculator never saw drafted is ordered behind
+    # the last real ADP.  ESPN's own draft board cannot do this job: it is an
+    # excellent match for real ADP in the current season and drifts badly for
+    # older ones -- rank correlation against FFC runs 0.96 in 2025, 0.75 in
+    # 2024 and 0.39 in 2023, off by 67 picks on average across the top 60.
+    # The projection-derived prior is steady instead (0.68 to 0.79 across the
+    # same seasons), so the tail is ordered by that.
     last = float(np.nanmax(pool.adp.to_numpy())) if pool.adp.notna().any() else 180.0
-    miss = pool.adp.isna() & pool.espn_rank.notna()
-    pool.loc[miss, "adp"] = last + pool.loc[miss, "espn_rank"].rank(method="first")
-    pool["adp"] = pool["adp"].fillna(last + len(pool))
+    miss = pool.adp.isna()
+    if miss.any():
+        tail = pool.loc[miss, "prior_ppg"].rank(ascending=False, method="first")
+        pool.loc[miss, "adp"] = last + tail
 
     return pool, proj_arr, act_arr, seen_arr
 
