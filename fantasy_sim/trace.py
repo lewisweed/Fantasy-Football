@@ -9,8 +9,6 @@ from __future__ import annotations
 
 import argparse
 
-import numpy as np
-
 from . import clean, season, values
 from .config import LEAGUE, POS_NAMES, season_config
 from .draft import PERSONA_NAMES

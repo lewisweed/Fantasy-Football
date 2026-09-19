@@ -24,8 +24,6 @@ def build_sd(players: list, n_weeks: int = N_WEEKS) -> values.SeasonData:
     Each entry is ``dict(name, pos, team, adp, prior, proj, act, out, quest,
     depth)`` where the weekly fields accept a scalar or a per-week sequence.
     """
-    n = len(players)
-
     def spread(p, key, default, dtype=float):
         v = p.get(key, default)
         arr = np.full(n_weeks, v, dtype=dtype) if np.isscalar(v) else np.asarray(v, dtype=dtype)

@@ -25,8 +25,6 @@ import pandas as pd
 from . import clean, season, values
 from .config import (ACTIVITY_WEIGHTS, LEAGUE, PERSONAS_2025, RESULTS,
                      RunConfig, season_config)
-from .draft import PERSONA_NAMES
-from .season import ACTIVITY_NAMES
 
 _CACHE: dict = {}
 

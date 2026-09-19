@@ -34,7 +34,7 @@ import numpy as np
 import pandas as pd
 
 from . import fetch, scoring
-from .config import CLEAN, N_POS, POS_ID, RAW, season_config
+from .config import CLEAN, POS_ID, RAW, season_config
 
 # FantasyPros pages that carry PPR consensus rankings.
 PRESEASON_PAGE = "/nfl/rankings/ppr-cheatsheets.php"

@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 from . import clean
-from .config import RESULTS, season_config
+from .config import RESULTS
 from .draft import PERSONA_NAMES
 from .season import ACTIVITY_NAMES
 

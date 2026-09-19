@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from fantasy_sim import clean, scoring
+from fantasy_sim import scoring
 from fantasy_sim.config import POS_NAMES
 
 

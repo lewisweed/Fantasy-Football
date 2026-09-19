@@ -64,6 +64,8 @@ class Team:
     fa_moves: int = 1
     sloppy: float = 0.05
     sunk_cost: float = 0.0          # reluctance to drop an early pick
+    hedges: bool = False            # benches Questionable players rather than risk them
+    gut: float = 0.08               # chance of taking a defensible second choice
     wins: int = 0
     losses: int = 0
     ties: int = 0
@@ -135,6 +137,8 @@ class LeagueSim:
                 p_check=ap["p_check"], max_claims=ap["max_claims"],
                 fa_moves=ap["fa_moves"], sloppy=ap["sloppy"],
                 sunk_cost=float(rng.uniform(0.0, 0.5)),
+                hedges=bool(rng.random() < 0.4),
+                gut=float(rng.uniform(0.05, 0.12)),
             )
             for r, p in enumerate(rosters[t]):
                 if p >= 0:
@@ -167,7 +171,20 @@ class LeagueSim:
             vals[mask] *= 0.55
         avail = V.availability(self.sd, week)
         opt = V.option_value(self.sd, week, vals, avail)
-        return vals * avail, opt
+        return vals * avail, opt * self.risk_appetite(team)
+
+    @staticmethod
+    def risk_appetite(team: Team) -> float:
+        """How much a manager is chasing upside right now.
+
+        Approaches shift with circumstances: a team out of the race starts
+        taking swings, and a team running away with it protects its floor.
+        """
+        games = team.wins + team.losses + team.ties
+        if games < 4:
+            return 1.0
+        tilt = 0.5 - team.wins / games
+        return float(np.clip(1.0 + 1.3 * tilt, 0.4, 1.7))
 
     # -- lineups ----------------------------------------------------------
     def set_lineup(self, team: Team, week: int):
@@ -184,8 +201,10 @@ class LeagueSim:
         if forgot:
             # Last week's projection says nothing about this week's bye.
             pass
-        else:
-            scores = scores * (1.0 - 0.35 * sd.quest[idx, w])
+        elif team.hedges:
+            # Some managers bench a Questionable player rather than risk the
+            # zero; others start him and take their chances.
+            scores = scores * (1.0 - 0.40 * sd.quest[idx, w])
         scores = scores + self.rng.normal(0.0, 0.6, len(idx))
         _, picked = V.best_lineup(scores, sd.pos[idx])
         starters = idx[picked]
@@ -249,7 +268,7 @@ class LeagueSim:
     # -- move evaluation --------------------------------------------------
     def roster_pack(self, team: Team, week: int, vals, up, roster=None):
         idx = np.array(team.all_players() if roster is None else roster, dtype=int)
-        sw = V.starter_weakness(idx, self.sd, vals)
+        sw = V.starter_weakness(idx, self.sd, vals, week)
         wk = self.sd.proj[:, week - 1]
         base = V.roster_value(idx, self.sd, vals, wk, up, sw)
         return idx, sw, wk, base
@@ -378,6 +397,25 @@ class LeagueSim:
             return order
         return list(self.waiver_order)
 
+    def gut_choice(self, moves, team: Team):
+        """Which of the ranked moves the manager actually goes for.
+
+        When two options are close, real managers go on gut, recent weeks or a
+        matchup they like, and occasionally on nothing at all.  The best move
+        stays much the most likely one.
+        """
+        if len(moves) < 2:
+            return moves[0]
+        r = self.rng.random()
+        if r < team.gut:
+            # A defensible second choice.
+            return moves[1]
+        if r < team.gut + 0.02:
+            # Every so often, something plainly worse.
+            k = int(self.rng.integers(0, min(5, len(moves))))
+            return moves[k]
+        return moves[0]
+
     def plan_claims(self, team: Team, week: int, vals, up, pool):
         """A manager's ranked waiver claims for the week.
 
@@ -392,7 +430,7 @@ class LeagueSim:
             moves = self.candidate_moves(team, week, vals, up, avail, roster=roster)
             if not moves:
                 break
-            gain, add, drop = moves[0]
+            gain, add, drop = self.gut_choice(moves, team)
             if gain <= team.threshold:
                 break
             ranked.append((gain, add, drop))
@@ -551,7 +589,6 @@ class LeagueSim:
         self.regular_season()
         self.reg_pts_for = np.array([t.pts_for for t in self.teams])
         seeds, champ, runner = self.playoffs()
-        sd = self.sd
         n = self.cfg.n_teams
         res = {
             "seed": np.full(n, 0, dtype=np.int8),

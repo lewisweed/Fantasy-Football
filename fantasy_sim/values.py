@@ -355,18 +355,31 @@ def roster_value(idx: np.ndarray, sd: "SeasonData", values: np.ndarray,
     return val
 
 
-def starter_weakness(idx: np.ndarray, sd: SeasonData, values: np.ndarray) -> np.ndarray:
-    """0 = elite starters at this position, 1 = replacement level."""
+def starter_weakness(idx: np.ndarray, sd: SeasonData, values: np.ndarray,
+                     week: int) -> np.ndarray:
+    """0 = elite starters at this position, 1 = replacement level.
+
+    A bye in the next fortnight counts as weakness, because that is exactly
+    when a bench player at the position stops being a spare and starts being
+    the lineup.  It is also why a manager with one quarterback goes shopping
+    for a second the week before his bye and not before.
+    """
     out = np.zeros(N_POS)
     if len(idx) == 0:
         return out
     pos = sd.pos[idx]
-    v = values[idx]
+    upcoming = set(range(week + 1, min(week + 3, sd.n_weeks + 1)))
     for p, need, good in ((RB, 2, 13.0), (WR, 2, 13.0), (TE, 1, 10.0), (QB, 1, 18.0)):
-        sel = v[pos == p]
-        if len(sel) == 0:
+        at_pos = idx[pos == p]
+        if len(at_pos) == 0:
             out[p] = 1.0
             continue
-        sel = np.sort(sel)[::-1][:need]
-        out[p] = float(np.clip(1.0 - sel.mean() / good, 0.0, 1.0))
+        order = at_pos[np.argsort(-values[at_pos])][:need]
+        sel = values[order]
+        weak = float(np.clip(1.0 - sel.mean() / good, 0.0, 1.0))
+        # How many of the players who would start are about to be unavailable?
+        away = sum(1 for i in order if int(sd.bye[i]) in upcoming)
+        if away:
+            weak = float(np.clip(weak + 0.55 * away / need, 0.0, 1.0))
+        out[p] = weak
     return out

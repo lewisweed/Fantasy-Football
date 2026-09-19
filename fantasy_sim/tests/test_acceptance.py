@@ -170,7 +170,7 @@ def test_injured_stars_are_stashed_not_cut_for_a_streaming_kicker():
     team.draft_pick_round = {1: 1}
     vals, opt = sim.team_values(team, week)
     idx = np.array(team.roster)
-    sw = values.starter_weakness(idx, sd, vals)
+    sw = values.starter_weakness(idx, sd, vals, week)
     base = values.roster_value(idx, sd, vals, sd.proj[:, week - 1], opt, sw)
 
     def cost(p):
@@ -180,6 +180,44 @@ def test_injured_stars_are_stashed_not_cut_for_a_streaming_kicker():
     star = int(np.where(sd.name == "hurt_star_rb")[0][0])
     bench_wr = int(np.where(sd.name == "wr5")[0][0])
     assert cost(star) > cost(bench_wr), (cost(star), cost(bench_wr))
+
+
+def test_an_approach_shifts_with_the_standings():
+    """Section 5.3: a team at 1-5 takes more upside swings, a 7-1 team plays
+    it safe."""
+    sd = build_sd(base_roster_spec())
+    sim = bare_sim(sd)
+    losing = make_team(sim, list(range(16)), tid=0)
+    winning = make_team(sim, list(range(16)), tid=1)
+    losing.wins, losing.losses = 1, 5
+    winning.wins, winning.losses = 7, 1
+    even = make_team(sim, list(range(16)), tid=2)
+    even.wins, even.losses = 3, 3
+    assert sim.risk_appetite(losing) > sim.risk_appetite(even) > sim.risk_appetite(winning)
+    # Early on, before anyone knows anything, nobody has shifted yet.
+    fresh = make_team(sim, list(range(16)), tid=3)
+    fresh.wins, fresh.losses = 2, 1
+    assert sim.risk_appetite(fresh) == 1.0
+
+
+def test_a_bye_makes_a_backup_worth_carrying():
+    """Section 5.2: a bench quarterback is worth something when the starter has
+    a bye coming, and close to nothing when he does not."""
+    week = 5
+    roster = base_roster_spec()
+    weakness = {}
+    for label, bye in (("bye_soon", week + 1), ("no_bye", 0)):
+        roster[0] = dict(name="qb_starter", pos="QB", team="QBT", prior=20.0,
+                         proj=20.0, bye=bye)
+        sd = build_sd(roster)
+        sim = bare_sim(sd)
+        team = make_team(sim, list(range(len(roster))))
+        vals, _ = sim.team_values(team, week)
+        sw = values.starter_weakness(np.array(team.roster), sd, vals, week)
+        weakness[label] = sw[0]
+    assert weakness["bye_soon"] > weakness["no_bye"]
+    assert values.bench_boost(0, np.array([weakness["bye_soon"], 0, 0, 0, 0, 0])) > \
+           values.bench_boost(0, np.array([weakness["no_bye"], 0, 0, 0, 0, 0]))
 
 
 def test_a_bye_week_never_earns_an_injured_reserve_slot():
