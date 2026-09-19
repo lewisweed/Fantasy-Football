@@ -46,10 +46,11 @@ environment's egress policy** (`lm-api-reads.fantasy.espn.com` and
 `fantasyfootballcalculator.com` are refused at the proxy), so neither could be
 used here.
 
-`fetch.py` still implements both, exactly as specified, and `clean.py` prefers
-them whenever their files are present — run the pipeline somewhere with open
-network access and the higher tier is picked up automatically. In this
-environment the simulator runs on the fallback tier instead:
+`fetch.py` implements both downloaders exactly as specified, so the files can
+be fetched from any machine with open network access and dropped into
+`fantasy_sim/data/raw/`. **The tier-1 reader in `clean.py` is not written yet**
+— there was nothing to write it against — so today the pipeline runs on the
+fallback tier regardless:
 
 - **Scoring.** ESPN's own `appliedTotal` is replaced by ESPN's published PPR
   rules applied to nflverse box scores. Verified against nflverse's own PPR

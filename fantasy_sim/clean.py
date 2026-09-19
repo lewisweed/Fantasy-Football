@@ -510,7 +510,9 @@ def build(year: int, *, force: bool = False) -> tuple[Path, Path]:
                         played=played, depth=depth)
     meta = {
         "year": year, "n_players": int(n), "n_weeks": n_weeks,
-        "tier": "espn" if (RAW / f"espn_players_{year}.json").exists() else "nflverse+fantasypros",
+        "tier": "nflverse+fantasypros",
+        "espn_file_present": (RAW / f"espn_players_{year}.json").exists(),
+        "ffc_file_present": (RAW / f"ffc_adp_{year}.json").exists(),
         "calibration_years": cal_years,
     }
     (CLEAN / f"meta_{year}.json").write_text(json.dumps(meta, indent=2))
