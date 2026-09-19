@@ -1,0 +1,10 @@
+# Raw downloads are large and fully reproducible: python -m fantasy_sim.fetch
+fantasy_sim/data/raw/
+
+# Per-chunk simulation checkpoints; the stitched teams.parquet is kept.
+results/*/chunk_*.parquet
+results/*/diag_*.npz
+
+__pycache__/
+*.pyc
+.pytest_cache/
