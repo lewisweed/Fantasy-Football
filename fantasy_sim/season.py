@@ -13,10 +13,9 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from .config import (ACTIVITY_PARAMS, ACTIVITY_WEIGHTS, DST, K, N_POS, QB, RB,
-                     SLOT_NAMES, TE, WR, POS_NAMES)
+from .config import ACTIVITY_PARAMS, ACTIVITY_WEIGHTS, N_POS, QB
 from . import values as V
-from .draft import PERSONA_NAMES, PERSONA_ID, run_draft, sample_personas
+from .draft import PERSONA_ID, run_draft, sample_personas
 
 ACTIVITY_NAMES = list(ACTIVITY_WEIGHTS)
 
@@ -98,8 +97,10 @@ class LeagueSim:
         self.force_team = force_team
         self.n_weeks = season_cfg.n_weeks
         self.free = np.ones(sd.n, dtype=bool)
-        # Players dropped last week clear waivers before hitting free agency.
-        self.on_waivers = np.zeros(sd.n, dtype=bool)
+        # The week a player was dropped.  He is claimable on the next waiver
+        # run but cannot be picked straight back up as a free agent, which is
+        # ESPN's waiver period.
+        self.dropped_week = np.full(sd.n, -1, dtype=np.int16)
         self.add_count = np.zeros(sd.n, dtype=np.int32)
         self.drop_count = np.zeros(sd.n, dtype=np.int32)
         self.drafted_drop_count = np.zeros(sd.n, dtype=np.int32)
@@ -120,6 +121,7 @@ class LeagueSim:
             trace=self.tracer.draft if self.tracer else None,
             qb_round=qb_round)
 
+        self.pick_of = pick_of          # overall pick number, per player
         self.teams = []
         for t in range(cfg.n_teams):
             ap = ACTIVITY_PARAMS[ACTIVITY_NAMES[acts[t]]]
@@ -227,7 +229,7 @@ class LeagueSim:
         else:
             return
         self.free[p] = True
-        self.on_waivers[p] = True
+        self.dropped_week[p] = week
         team.drops += 1
         self.drop_count[p] += 1
         if p in team.draft_pick_round:
@@ -238,7 +240,7 @@ class LeagueSim:
     def execute_add(self, team: Team, p: int, week: int, reason: str):
         team.roster.append(p)
         self.free[p] = False
-        self.on_waivers[p] = False
+        self.dropped_week[p] = -1
         team.adds += 1
         self.add_count[p] += 1
         if self.tracer:
@@ -333,6 +335,28 @@ class LeagueSim:
         out.sort(key=lambda x: -x[0])
         return out
 
+    def why(self, add: int, drop: int, week: int, gain: float, kind: str) -> tuple:
+        """A human-readable reason for a move, for the trace.
+
+        Purely descriptive -- it never feeds back into the decision.
+        """
+        sd, w = self.sd, week - 1
+        from .config import DST, K
+        tags = []
+        if sd.injured[drop, w]:
+            tags.append(f"dropping an injured player (out {sd.out_streak[drop, w]}w)")
+        if sd.pos[add] in (K, DST):
+            tags.append("streaming")
+        starter = sd.ahead[add, w]
+        if starter >= 0 and sd.out[starter, w]:
+            tags.append(f"role change behind {sd.name[starter]}")
+        elif starter >= 0 and sd.quest[starter, w]:
+            tags.append(f"handcuff, {sd.name[starter]} questionable")
+        if sd.injured[add, w]:
+            tags.append("stash")
+        note = f"{kind} (+{gain:.1f})" + (" -- " + "; ".join(tags) if tags else "")
+        return note, note
+
     # -- waivers ----------------------------------------------------------
     def waiver_priority(self, week: int):
         cfg = self.cfg
@@ -394,8 +418,9 @@ class LeagueSim:
                 if drop not in team.all_players():
                     vals, up = self.team_values(team, week)
                     drop = self.worst_drop(team, vals, up, week)
-                self.execute_drop(team, drop, week, f"waiver claim (+{gain:.1f})")
-                self.execute_add(team, add, week, f"waiver claim (+{gain:.1f})")
+                d_why, a_why = self.why(add, drop, week, gain, "waiver claim")
+                self.execute_drop(team, drop, week, d_why)
+                self.execute_add(team, add, week, a_why)
                 if self.cfg.waiver_system == "rolling":
                     self.waiver_order.remove(t)
                     self.waiver_order.append(t)
@@ -403,9 +428,6 @@ class LeagueSim:
                     to_back.append(t)
             # Successful claimants drop to the back of the line for this run.
             order = retry + to_back
-
-        # Everything still unclaimed becomes an ordinary free agent.
-        self.on_waivers[:] = False
 
     def run_free_agency(self, week: int):
         """Thursday-to-Sunday pickups: streaming, late injury news, hunches."""
@@ -417,7 +439,8 @@ class LeagueSim:
             team = self.teams[t]
             if self.rng.random() > team.p_check:
                 continue
-            pool = self.free & ~self.on_waivers
+            # Anyone dropped this week is still sitting on waivers.
+            pool = self.free & (self.dropped_week < week)
             vals, up = self.team_values(team, week)
             moves = self.candidate_moves(team, week, vals, up, pool, top_n=2)
             if not moves:
@@ -428,8 +451,9 @@ class LeagueSim:
                 continue
             if drop not in team.all_players():
                 continue
-            self.execute_drop(team, drop, week, f"free agent (+{gain:.1f})")
-            self.execute_add(team, add, week, f"free agent (+{gain:.1f})")
+            d_why, a_why = self.why(add, drop, week, gain, "free agent")
+            self.execute_drop(team, drop, week, d_why)
+            self.execute_add(team, add, week, a_why)
 
     # -- play -------------------------------------------------------------
     def play_week(self, week: int, matchups, record: bool = True):
@@ -535,6 +559,7 @@ class LeagueSim:
             "first_qb_round": np.array([t.first_qb_round for t in self.teams], dtype=np.int8),
             "first_qb": np.array([t.first_qb for t in self.teams], dtype=np.int32),
             "qb_points": np.array([t.qb_points for t in self.teams]),
+            "ties": np.array([t.ties for t in self.teams], dtype=np.int8),
         }
         for rank, t in enumerate(seeds):
             res["seed"][t] = rank + 1

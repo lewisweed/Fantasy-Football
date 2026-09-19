@@ -361,7 +361,7 @@ def build_report(year: int) -> Path:
     pool, _ = clean.load(year)
     meta_path = (RESULTS / f"{year}_base" / "config.json")
     meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
-    clean_meta_path = pool_meta = Path(clean.CLEAN / f"meta_{year}.json")
+    pool_meta = Path(clean.CLEAN) / f"meta_{year}.json"
     src = json.loads(pool_meta.read_text())["tier"] if pool_meta.exists() else "?"
 
     n_leagues = len(teams) // 12

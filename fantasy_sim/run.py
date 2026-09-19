@@ -40,9 +40,9 @@ def _season_data(year: int) -> values.SeasonData:
     return _CACHE[year]
 
 
-TEAM_COLS = ("persona", "activity", "draft_slot", "wins", "losses", "pts_for",
-             "reg_pts", "seed", "playoffs", "champion", "runner_up", "adds",
-             "drops", "first_qb_round", "first_qb", "qb_points")
+TEAM_COLS = ("persona", "activity", "draft_slot", "wins", "losses", "ties",
+             "pts_for", "reg_pts", "seed", "playoffs", "champion", "runner_up",
+             "adds", "drops", "first_qb_round", "first_qb", "qb_points")
 
 
 def run_chunk(job) -> dict:
@@ -76,10 +76,10 @@ def run_chunk(job) -> dict:
         adds += sim.add_count.astype(np.int64)
         drops += sim.drop_count.astype(np.int64)
         drafted_drops += sim.drafted_drop_count.astype(np.int64)
+        picked = sim.pick_of > 0
+        drafted[picked] += 1
+        pick_sum[picked] += sim.pick_of[picked]
         for t in sim.teams:
-            for p, rnd in t.draft_pick_round.items():
-                drafted[p] += 1
-                pick_sum[p] += (rnd - 1) * n + 1
             qb_rostered.append(sum(1 for p in t.all_players() if sd.pos[p] == 0))
 
     df = pd.DataFrame(rows)

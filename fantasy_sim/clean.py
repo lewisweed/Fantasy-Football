@@ -293,6 +293,7 @@ def availability(year: int, gsis: pd.Series, teams: pd.Series, n_weeks: int,
         elif st == "Questionable":
             quest[i, wk - 1] = True
 
+    active = np.zeros((n, n_weeks), dtype=bool)
     try:
         wr = pd.read_csv(fetch.weekly_rosters(year), low_memory=False,
                          usecols=["week", "game_type", "status", "gsis_id"])
@@ -302,7 +303,6 @@ def availability(year: int, gsis: pd.Series, teams: pd.Series, n_weeks: int,
         wr = wr[wr.game_type == "REG"].dropna(subset=["gsis_id"])
         # UNAVAILABLE: injured reserve, cut, retired, exempt list.
         bad = {"RES", "CUT", "RET", "EXE", "TRC"}
-        active = np.zeros((n, n_weeks), dtype=bool)
         seen = np.zeros((n, n_weeks), dtype=bool)
         for gid, wk, st in zip(wr.gsis_id, wr.week, wr.status):
             i = idx.get(gid)
@@ -319,8 +319,10 @@ def availability(year: int, gsis: pd.Series, teams: pd.Series, n_weeks: int,
         tracked = seen.any(axis=1) & ~is_dst
         out |= (~seen) & tracked[:, None]
 
+    # A player who was ruled out and has not reappeared in the weekly rankings
+    # is still out -- unless the roster says he is back on the active list.
     for w in range(1, n_weeks):
-        out[:, w] |= out[:, w - 1] & ~ranked[:, w]
+        out[:, w] |= out[:, w - 1] & ~ranked[:, w] & ~active[:, w]
     return out, quest
 
 
