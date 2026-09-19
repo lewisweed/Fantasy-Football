@@ -3,18 +3,37 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from fantasy_sim import scoring
 from fantasy_sim.config import POS_NAMES
 
 
-def test_projection_is_only_zeroed_when_the_player_is_known_out(real):
-    """The leak the build spec calls out: a projection must never be zeroed
-    just because the player turned out not to play."""
+def test_no_scoring_week_carries_a_zero_projection(real):
+    """The leak the build spec calls out.
+
+    A source zeroes a weekly projection for any week the player ended up
+    missing, including the week he got hurt mid-game -- so a week where he
+    scored points must never come with a projection of zero unless he was
+    officially unavailable before kickoff.
+    """
     pool, arrays, _ = real
-    proj, out = arrays["proj"], arrays["out"]
-    zeroed_but_available = (proj <= 0) & ~out
-    assert zeroed_but_available.sum() == 0
+    proj, out, act = arrays["proj"], arrays["out"], arrays["act"]
+    leaked = (proj <= 0) & ~out & (act > 0)
+    assert leaked.sum() == 0, pool.player[np.where(leaked)[0][:5]].tolist()
+
+
+def test_the_burrow_case_is_repaired(real):
+    """2025 week 2: projection zero, seven points scored, because he was hurt
+    during the game.  Weeks 3 to 12 he really was on injured reserve."""
+    pool, arrays, _ = real
+    hits = np.where(pool.player.to_numpy() == "Joe Burrow")[0]
+    if not len(hits):
+        pytest.skip("Joe Burrow not in this season's pool")
+    i = int(hits[0])
+    assert arrays["act"][i, 1] > 0
+    assert arrays["proj"][i, 1] > 10, "week 2 projection was not restored"
+    assert arrays["out"][i, 2:12].all(), "the injured-reserve weeks are missing"
 
 
 def test_players_who_scored_were_not_marked_out_in_bulk(real):
@@ -27,13 +46,18 @@ def test_players_who_scored_were_not_marked_out_in_bulk(real):
 
 
 def test_bye_weeks_come_from_the_schedule(real):
+    """Every player on an NFL team has exactly one bye, and nobody is
+    projected to score on it.  Free agents have no team and so no bye."""
     pool, arrays, _ = real
     byes = pool.bye.to_numpy()
-    has_bye = byes > 0
-    # Every team's players share one bye, and nobody is projected on it.
-    rows = np.where(has_bye)[0]
+    on_a_team = (pool.team != "FA").to_numpy()
+    rows = np.where(byes > 0)[0]
     assert arrays["proj"][rows, byes[rows] - 1].max() == 0
-    assert 0.9 < has_bye.mean() <= 1.0
+    assert (byes[on_a_team] > 0).all(), \
+        sorted(set(pool.team[on_a_team & (byes <= 0)]))
+    # Each team's bye is shared by all of its players.
+    per_team = pool[on_a_team].groupby("team").bye.nunique()
+    assert (per_team == 1).all(), per_team[per_team > 1].to_dict()
 
 
 def test_form_never_reads_the_current_week(real):

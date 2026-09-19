@@ -34,42 +34,38 @@ simulator runs with no network access.
 
 | What | Source |
 |---|---|
-| Weekly actuals, injury reports, weekly rosters, depth charts, snap counts, schedules | [nflverse](https://github.com/nflverse/nflverse-data) |
-| PPR draft board, weekly and rest-of-season consensus rankings | FantasyPros, via the [DynastyProcess](https://github.com/dynastyprocess/data) mirror |
-| Scoring | ESPN standard PPR (`leaguedefaults/3`), applied to nflverse box scores by `scoring.py` |
+| Player pool, weekly projections, weekly actuals (`appliedTotal`) | ESPN `kona_player_info`, PPR league defaults |
+| Average draft position | Fantasy Football Calculator, 12-team PPR, 8,470 real mock drafts |
+| Injury reports, weekly rosters, depth charts, schedules, byes | [nflverse](https://github.com/nflverse/nflverse-data) |
+| Fallback board and projections when ESPN is unavailable | FantasyPros PPR consensus, via the [DynastyProcess](https://github.com/dynastyprocess/data) mirror |
 
-### A note on ESPN and Fantasy Football Calculator
+`clean.py` has two tiers and picks whichever it can actually build.
 
-The build spec names ESPN's `kona_player_info` feed as the primary source and
-Fantasy Football Calculator as the ADP source. **Both hosts are blocked by this
-environment's egress policy** (`lm-api-reads.fantasy.espn.com` and
-`fantasyfootballcalculator.com` are refused at the proxy), so neither could be
-used here.
+**Tier 1 (`espn+ffc`, the default when the files are present).** ESPN supplies
+the pool, its own weekly projections and its own scoring; Fantasy Football
+Calculator supplies real mock-draft ADP with the spread across drafts, and
+ESPN's PPR board prices anyone FFC never saw drafted. The 2025 board has 29
+quarterbacks inside pick 192, and simulated drafts reproduce real ADP at
+r = 0.934 with a mean gap of 5.4 picks across the top 100.
 
-`fetch.py` implements both downloaders exactly as specified, so the files can
-be fetched from any machine with open network access and dropped into
-`fantasy_sim/data/raw/`. **The tier-1 reader in `clean.py` is not written yet**
-— there was nothing to write it against — so today the pipeline runs on the
-fallback tier regardless:
+The two ESPN and FFC snapshots are not in this repository — they are large and
+are fetched rather than derived. `python -m fantasy_sim.fetch` downloads them
+where the hosts are reachable; otherwise drop `espn_players_{year}.json` and
+`ffc_adp_{year}.json` into `fantasy_sim/data/raw/` by hand. Availability and
+depth-chart roles always come from nflverse, in both tiers, because ESPN's feed
+carries only an end-of-season snapshot of a player's status.
 
-- **Scoring.** ESPN's own `appliedTotal` is replaced by ESPN's published PPR
-  rules applied to nflverse box scores. Verified against nflverse's own PPR
-  column to within 0.011 points per player-week.
-- **Draft board.** Fantasy Football Calculator ADP is replaced by the final
-  preseason FantasyPros PPR consensus board (535 players, with the expert
-  standard deviation as the ADP spread). This lands very close to the spec's
-  own calibration fact: the spec reports 29 quarterbacks inside FFC pick 192 in
-  2025; the FantasyPros board has 27.
-- **Projections.** ESPN's weekly projections are replaced by weekly FantasyPros
-  PPR positional rankings converted to points through rank-to-points curves
-  **fitted on 2021–2024 only**, with rest-of-season rankings filling the gaps.
-  Weekly correlation with actual scoring is 0.63 overall (0.69 RB, 0.59 QB,
-  0.58 WR, 0.57 TE), and the mean projection matches the mean outcome to within
-  a few tenths of a point at every position.
+**Tier 2 (`nflverse+fantasypros`).** Used automatically when the ESPN file is
+absent. ESPN's `appliedTotal` is replaced by ESPN's published PPR rules applied
+to nflverse box scores (`scoring.py`, verified against nflverse's own PPR column
+to within 0.011 points per player-week), the draft board by the final preseason
+FantasyPros PPR consensus, and weekly projections by FantasyPros weekly
+rankings mapped to points through curves **fitted on other seasons only**.
+Weekly correlation with actual scoring is 0.63 against tier 1's 0.66, and the
+resulting persona leaderboard agrees with tier 1 closely, so the fallback is a
+reasonable stand-in rather than a different experiment.
 
-Section 9's prior findings were produced from ESPN's own numbers, so
-differences against them may be data-tier differences rather than model
-differences. Treat that comparison with care.
+`meta_{year}.json` records which tier a build used.
 
 ## No hindsight
 

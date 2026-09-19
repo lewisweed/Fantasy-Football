@@ -58,8 +58,11 @@ SUFFIX = re.compile(r"\b(jr|sr|ii|iii|iv|v)\b")
 PUNCT = re.compile(r"[^a-z ]")
 
 # FantasyPros / nflverse team-abbreviation drift.
+# nflverse writes the Rams as LA while ESPN and FantasyPros write LAR, which
+# silently cost that team its bye week and its D/ST scoring until it was caught.
 TEAM_FIX = {"JAC": "JAX", "LVR": "LV", "OAK": "LV", "SD": "LAC", "STL": "LAR",
-            "WSH": "WAS", "ARZ": "ARI", "BLT": "BAL", "CLV": "CLE", "HST": "HOU"}
+            "LA": "LAR", "WSH": "WAS", "ARZ": "ARI", "BLT": "BAL",
+            "CLV": "CLE", "HST": "HOU"}
 
 
 def norm_name(s: str) -> str:
@@ -356,28 +359,184 @@ def depth_ranks(year: int, gsis: pd.Series, cal: pd.DataFrame, n_weeks: int) -> 
 
 
 # --------------------------------------------------------------------------
+# Tier 1: ESPN player pool + Fantasy Football Calculator ADP
+# --------------------------------------------------------------------------
+#: ESPN's own position ids.
+ESPN_POS = {1: "QB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 16: "DST"}
+
+#: ESPN's proTeamId, in nflverse abbreviations.
+ESPN_TEAM = {
+    0: "FA", 1: "ATL", 2: "BUF", 3: "CHI", 4: "CIN", 5: "CLE", 6: "DAL",
+    7: "DEN", 8: "DET", 9: "GB", 10: "TEN", 11: "IND", 12: "KC", 13: "LV",
+    14: "LAR", 15: "MIA", 16: "MIN", 17: "NE", 18: "NO", 19: "NYG", 20: "NYJ",
+    21: "PHI", 22: "ARI", 23: "PIT", 24: "LAC", 25: "SF", 26: "SEA", 27: "TB",
+    28: "WAS", 29: "CAR", 30: "JAX", 33: "BAL", 34: "HOU",
+}
+
+#: Fantasy Football Calculator's position codes.
+FFC_POS = {"PK": "K", "DEF": "DST"}
+
+
+def espn_available(year: int) -> bool:
+    return (RAW / f"espn_players_{year}.json").exists()
+
+
+def ffc_board(year: int) -> pd.DataFrame:
+    """Fantasy Football Calculator 12-team PPR ADP, keyed for matching."""
+    path = RAW / f"ffc_adp_{year}.json"
+    if not path.exists():
+        return pd.DataFrame(columns=["nname", "pos", "team", "adp", "stdev"])
+    raw = json.loads(path.read_text())
+    rows = []
+    for p in raw.get("players", []):
+        pos = FFC_POS.get(p["position"], p["position"])
+        rows.append(dict(nname=norm_name(p["name"]), pos=pos,
+                         team=fix_team(p.get("team", "")),
+                         adp=float(p["adp"]),
+                         stdev=float(p.get("stdev") or 0.0)))
+    return pd.DataFrame(rows)
+
+
+def espn_pool(year: int, n_weeks: int):
+    """The ESPN player pool with its own weekly projections and actuals.
+
+    Returns ``(pool, proj_raw, act, act_present)``.  ``proj_raw`` is exactly
+    what ESPN published, zeroes and all; the leak repair happens later, in
+    :func:`build`, because it needs to know who was genuinely unavailable.
+    """
+    raw = json.loads((RAW / f"espn_players_{year}.json").read_text())
+    players = raw["players"] if isinstance(raw, dict) else raw
+
+    rows, projs, acts, present = [], [], [], []
+    for entry in players:
+        p = entry.get("player", entry)
+        pos = ESPN_POS.get(p.get("defaultPositionId"))
+        if pos is None:
+            continue
+        pr = np.zeros(n_weeks)
+        ac = np.zeros(n_weeks)
+        seen = np.zeros(n_weeks, dtype=bool)
+        season_proj = 0.0
+        for st in p.get("stats", []):
+            if st.get("seasonId") != year:
+                continue
+            total = st.get("appliedTotal")
+            split, source = st.get("statSplitTypeId"), st.get("statSourceId")
+            if split == 0 and source == 1:
+                season_proj = float(total or 0.0)
+            elif split == 1:
+                w = st.get("scoringPeriodId", 0)
+                if not (1 <= w <= n_weeks):
+                    continue
+                if source == 1:
+                    pr[w - 1] = float(total or 0.0)
+                elif source == 0:
+                    ac[w - 1] = float(total or 0.0)
+                    seen[w - 1] = total is not None
+        # A player ESPN never projects at all is not in anyone's league.
+        if season_proj <= 0 and pr.max() <= 0 and pos not in ("K", "DST"):
+            continue
+        ranks = (p.get("draftRanksByRankType") or {}).get("PPR") or {}
+        rows.append(dict(
+            player=p.get("fullName", ""), pos=pos,
+            team=fix_team(ESPN_TEAM.get(p.get("proTeamId"), "FA")),
+            espn_id=int(p.get("id", -1)),
+            espn_rank=float(ranks.get("rank") or np.nan),
+            season_proj=season_proj))
+        projs.append(pr)
+        acts.append(ac)
+        present.append(seen)
+
+    pool = pd.DataFrame(rows).reset_index(drop=True)
+    pool["nname"] = pool["player"].map(norm_name)
+    # D/ST are named for the franchise, so they match on team, not on name.
+    pool.loc[pool.pos == "DST", "nname"] = pool.loc[pool.pos == "DST", "team"]
+    # A player ESPN never gave a preseason number sits at the bottom of his
+    # position rather than at zero: nobody expected anything of him, but "not
+    # rated" is not the same as "cannot score".
+    prior = (pool["season_proj"] / n_weeks).to_numpy(copy=True)
+    for pos in pool.pos.unique():
+        at = (pool.pos == pos).to_numpy()
+        rated = prior[at & (prior > 0)]
+        if len(rated):
+            prior[at & (prior <= 0)] = float(np.percentile(rated, 10))
+    pool["prior_ppg"] = prior
+
+    # -- ADP: real mock drafts first, ESPN's own board as the fallback ----
+    ffc = ffc_board(year)
+    pool["adp"] = np.nan
+    pool["adp_sd"] = np.nan
+    if len(ffc):
+        skill = ffc[ffc.pos != "DST"].drop_duplicates(["nname", "pos"])
+        merged = pool.merge(skill[["nname", "pos", "adp", "stdev"]],
+                            on=["nname", "pos"], how="left", suffixes=("", "_ffc"))
+        pool["adp"] = merged["adp_ffc"].to_numpy()
+        pool["adp_sd"] = merged["stdev"].to_numpy()
+        dst = ffc[ffc.pos == "DST"].drop_duplicates("team")
+        dmerge = pool.merge(dst[["team", "pos", "adp", "stdev"]],
+                            on=["team", "pos"], how="left", suffixes=("", "_d"))
+        take = pool.adp.isna() & dmerge.adp_d.notna()
+        pool.loc[take, "adp"] = dmerge.loc[take, "adp_d"].to_numpy()
+        pool.loc[take, "adp_sd"] = dmerge.loc[take, "stdev"].to_numpy()
+
+    # Everyone Fantasy Football Calculator never saw drafted is priced off
+    # ESPN's own PPR board, shifted past the last real ADP.
+    last = float(np.nanmax(pool.adp.to_numpy())) if pool.adp.notna().any() else 180.0
+    miss = pool.adp.isna() & pool.espn_rank.notna()
+    pool.loc[miss, "adp"] = last + pool.loc[miss, "espn_rank"].rank(method="first")
+    pool["adp"] = pool["adp"].fillna(last + len(pool))
+
+    return (pool, np.stack(projs) if projs else np.zeros((0, n_weeks)),
+            np.stack(acts) if acts else np.zeros((0, n_weeks)),
+            np.stack(present) if present else np.zeros((0, n_weeks), dtype=bool))
+
+
+def repair_projections(proj_raw: np.ndarray, act_present: np.ndarray,
+                       known_out: np.ndarray, prior_ppg: np.ndarray) -> np.ndarray:
+    """Undo ESPN's retrospective zeroing of weekly projections.
+
+    ESPN shows nothing for a week a player ended up missing -- including the
+    week he got hurt mid-game, which is information nobody had before kickoff.
+    Burrow in 2025 week 2 is the case the build spec names: projection zero,
+    seven points actually scored.
+
+    The repair is deliberately the narrowest one that fixes this.  It fires
+    only where the player accrued a stat line that week, so a zero is only
+    overwritten when we can see it contradicts itself; a backup quarterback
+    ESPN projects at zero because he is not starting keeps his zero, which is
+    real information and not a leak.  The restored value is his most recent
+    published projection, or his preseason expectation if he has none.
+    """
+    n, weeks = proj_raw.shape
+    out = proj_raw.copy()
+    for i in range(n):
+        last = 0.0
+        for w in range(weeks):
+            if known_out[i, w]:
+                out[i, w] = 0.0
+                continue
+            if proj_raw[i, w] > 0:
+                last = proj_raw[i, w]
+            elif act_present[i, w]:
+                out[i, w] = last if last > 0 else max(prior_ppg[i], 0.0)
+    return out
+
+
+# --------------------------------------------------------------------------
 # Build
 # --------------------------------------------------------------------------
-def build(year: int, *, force: bool = False) -> tuple[Path, Path]:
-    CLEAN.mkdir(parents=True, exist_ok=True)
-    uni_path = CLEAN / f"universe_{year}.parquet"
-    wk_path = CLEAN / f"weekly_{year}.npz"
-    if uni_path.exists() and wk_path.exists() and not force:
-        return uni_path, wk_path
+def _fantasypros_tier(year: int, n_weeks: int, games, cal) -> dict:
+    """Draft board and weekly expectations from FantasyPros PPR consensus.
 
-    cfg = season_config(year)
-    n_weeks = cfg.n_weeks
-    games = pd.read_csv(fetch.games(), low_memory=False)
-    cal = week_calendar(games, year)
+    Rankings are turned into points through curves fitted on *other* seasons,
+    so the target season never sees its own outcomes.
+    """
     ecr = load_ecr()
-
-    # -- calibration on other seasons only -------------------------------
     cal_years = [y for y in fetch.CALIBRATION_YEARS if y != year]
     cal_by_year = {y: week_calendar(games, y) for y in cal_years}
     weekly_curves = fit_weekly_curves(cal_years, cal_by_year)
-    pre_curve = fit_preseason_curve(cal_years, cal_by_year)   # per position
+    pre_curve = fit_preseason_curve(cal_years, cal_by_year)     # per position
 
-    # -- the player pool --------------------------------------------------
     board = preseason_board(ecr, cal)
     wk = weekly_ranks(ecr, cal, WEEKLY_PAGES)
     ros = weekly_ranks(ecr, cal, ROS_PAGES)
@@ -401,7 +560,6 @@ def build(year: int, *, force: bool = False) -> tuple[Path, Path]:
     ids = ids.dropna(subset=["fantasypros_id", "gsis_id"])
     fp2gsis = dict(zip(ids.fantasypros_id.astype(int), ids.gsis_id))
     pool["gsis_id"] = pool["id"].astype("Int64").map(fp2gsis)
-    # Name fallback for anyone the id map misses.
     act_names = (act[act.pos != "DST"]
                  .assign(nname=lambda d: d.player_display_name.map(norm_name))
                  .drop_duplicates(["nname", "pos"])
@@ -421,17 +579,15 @@ def build(year: int, *, force: bool = False) -> tuple[Path, Path]:
     kidx = {k: i for i, k in enumerate(pool.key)}
     fpidx = {int(i): j for j, i in enumerate(pool.id)}
 
-    # -- actuals ----------------------------------------------------------
     act_arr = np.zeros((n, n_weeks))
     played = np.zeros((n, n_weeks), dtype=bool)
     a = act[act.week <= n_weeks]
-    for k, w, p in zip(a.key, a.week, a.points):
+    for k, w, pts in zip(a.key, a.week, a.points):
         i = kidx.get(k)
         if i is not None:
-            act_arr[i, w - 1] = p
+            act_arr[i, w - 1] = pts
             played[i, w - 1] = True
 
-    # -- projections ------------------------------------------------------
     proj = np.full((n, n_weeks), np.nan)
     ranked = np.zeros((n, n_weeks), dtype=bool)
     for fid, w, rpos, r in zip(wk.id, wk.week, wk.rpos, wk.ecr):
@@ -444,7 +600,6 @@ def build(year: int, *, force: bool = False) -> tuple[Path, Path]:
         proj[i, w - 1] = apply_curve(curve, r)
         ranked[i, w - 1] = True
 
-    # Rest-of-season rank fills the gaps (bench players FantasyPros skips).
     ros_fill = np.full((n, n_weeks), np.nan)
     for fid, w, rpos, r in zip(ros.id, ros.week, ros.rpos, ros.ecr):
         i = fpidx.get(int(fid))
@@ -456,31 +611,101 @@ def build(year: int, *, force: bool = False) -> tuple[Path, Path]:
             # opportunity, so discount them toward the streaming baseline.
             ros_fill[i, w - 1] = apply_curve(curve, r) * 0.92
 
-    # Players who were never on the draft board are undrafted free agents.
     max_adp = float(np.nanmax(pool.adp.to_numpy()))
     pool["adp"] = pool["adp"].fillna(max_adp + 40.0)
 
     # Preseason prior, in points per game, from rank within position.
     pool["prank"] = (pool.sort_values("adp").groupby("pos").cumcount() + 1
                      ).reindex(pool.index)
-    prior_ppg = np.full(len(pool), np.nan)
+    prior = np.full(len(pool), np.nan)
     for pos, grp in pool.groupby("pos"):
         curve = pre_curve.get(pos)
         if curve is None:
             continue
-        prior_ppg[grp.index.to_numpy()] = apply_curve(curve, grp["prank"].to_numpy())
-    # Players with no draft-board rank sit at replacement level for their spot.
-    for pos, grp in pool.groupby("pos"):
-        curve = pre_curve.get(pos)
-        miss = grp.index[~np.isfinite(prior_ppg[grp.index.to_numpy()])]
-        if len(miss) and curve is not None:
-            prior_ppg[miss.to_numpy()] = curve[-1]
-    prior_ppg = np.where(np.isfinite(prior_ppg), prior_ppg, 1.0)
-    pool["prior_ppg"] = prior_ppg
-    pool["season_prior"] = prior_ppg * n_weeks
+        idx = grp.index.to_numpy()
+        prior[idx] = apply_curve(curve, grp["prank"].to_numpy())
+        miss = idx[~np.isfinite(prior[idx])]
+        if len(miss):
+            prior[miss] = curve[-1]
+    pool["prior_ppg"] = np.where(np.isfinite(prior), prior, 1.0)
 
     proj = np.where(np.isfinite(proj), proj, ros_fill)
-    proj = np.where(np.isfinite(proj), proj, prior_ppg[:, None] * 0.85)
+    proj = np.where(np.isfinite(proj), proj,
+                    pool["prior_ppg"].to_numpy()[:, None] * 0.85)
+
+    return dict(pool=pool, proj=proj, act=act_arr, played=played, ranked=ranked,
+                tier="nflverse+fantasypros", calibration_years=cal_years,
+                repair=False)
+
+
+def _espn_tier(year: int, n_weeks: int) -> dict:
+    """ESPN's own pool, weekly projections and ``appliedTotal`` actuals."""
+    pool, proj_raw, act_arr, act_present = espn_pool(year, n_weeks)
+
+    ids = pd.read_csv(fetch.player_ids(), low_memory=False)
+    ids = ids.dropna(subset=["espn_id", "gsis_id"])
+    espn2gsis = dict(zip(ids.espn_id.astype(int), ids.gsis_id))
+    pool["gsis_id"] = pool["espn_id"].map(espn2gsis)
+    # Fall back to a name match for anyone the id map misses.
+    by_name = (ids.dropna(subset=["merge_name"])
+               .assign(nn=lambda d: d.merge_name.map(norm_name))
+               .drop_duplicates(["nn", "position"])
+               .set_index(["nn", "position"])["gsis_id"])
+    miss = pool.gsis_id.isna() & (pool.pos != "DST")
+    pool.loc[miss, "gsis_id"] = [
+        by_name.get((nn, pos)) for nn, pos in
+        zip(pool.loc[miss, "nname"], pool.loc[miss, "pos"])]
+
+    pool["key"] = np.where(
+        pool.pos == "DST", "D:" + pool.team,
+        np.where(pool.gsis_id.notna(), "G:" + pool.gsis_id.astype(str),
+                 "E:" + pool.espn_id.astype(str)))
+    pool["id"] = pool["espn_id"]
+
+    # ESPN emits a zero stat line for every week a player is merely on a
+    # roster, so whether he actually took the field comes from the nflverse box
+    # scores instead.  This matters twice: it decides which zeroes are a leak
+    # worth repairing, and it keeps a benched player's rolling form from being
+    # dragged down by games he never played.
+    played = np.zeros((len(pool), n_weeks), dtype=bool)
+    box = actual_points(year)
+    box = box[box.week <= n_weeks]
+    kidx = {k: i for i, k in enumerate(pool.key)}
+    for k, w in zip(box.key, box.week):
+        i = kidx.get(k)
+        if i is not None:
+            played[i, w - 1] = True
+    # Anyone nflverse cannot be matched to falls back to ESPN's own evidence.
+    unmatched = ~np.isin(pool.key.to_numpy(), box.key.unique())
+    played[unmatched] = act_present[unmatched] & (act_arr[unmatched] > 0)
+
+    # ESPN zeroes a weekly projection retrospectively, so it is no evidence
+    # that a player was known out.  Availability comes from the injury report
+    # and the weekly NFL roster instead, and the carry-over rule is left off.
+    ranked = np.ones((len(pool), n_weeks), dtype=bool)
+    return dict(pool=pool, proj=proj_raw, act=act_arr, played=played,
+                ranked=ranked, tier="espn+ffc", calibration_years=[],
+                repair=True)
+
+
+def build(year: int, *, force: bool = False) -> tuple[Path, Path]:
+    CLEAN.mkdir(parents=True, exist_ok=True)
+    uni_path = CLEAN / f"universe_{year}.parquet"
+    wk_path = CLEAN / f"weekly_{year}.npz"
+    if uni_path.exists() and wk_path.exists() and not force:
+        return uni_path, wk_path
+
+    cfg = season_config(year)
+    n_weeks = cfg.n_weeks
+    games = pd.read_csv(fetch.games(), low_memory=False)
+    cal = week_calendar(games, year)
+
+    data = (_espn_tier(year, n_weeks) if espn_available(year)
+            else _fantasypros_tier(year, n_weeks, games, cal))
+    pool = data["pool"]
+    proj, act_arr, played, ranked = (data["proj"], data["act"],
+                                     data["played"], data["ranked"])
+    n = len(pool)
 
     # -- availability -----------------------------------------------------
     gsis = pool["gsis_id"].astype("string").fillna("")
@@ -492,7 +717,11 @@ def build(year: int, *, force: bool = False) -> tuple[Path, Path]:
         if 1 <= b <= n_weeks:
             out[i, b - 1] = True
 
+    # -- projections ------------------------------------------------------
+    if data["repair"]:
+        proj = repair_projections(proj, played, out, pool["prior_ppg"].to_numpy())
     proj = np.where(out, 0.0, proj)
+    played = played & ~out
     # Actuals are left exactly as they were scored; only expectations are zeroed.
 
     depth = depth_ranks(year, gsis, cal, n_weeks)
@@ -500,6 +729,7 @@ def build(year: int, *, force: bool = False) -> tuple[Path, Path]:
     # -- ADP spread -------------------------------------------------------
     pool["adp_sd"] = pool["adp_sd"].fillna(pool["adp"] * 0.12)
     pool["adp_sd"] = np.maximum(pool["adp_sd"] * cfg.adp_sd_scale, cfg.adp_sd_floor)
+    pool["season_prior"] = pool["prior_ppg"] * n_weeks
     pool["pos_id"] = pool["pos"].map(POS_ID).astype(int)
 
     keep = ["key", "player", "pos", "pos_id", "team", "adp", "adp_sd",
@@ -510,10 +740,10 @@ def build(year: int, *, force: bool = False) -> tuple[Path, Path]:
                         played=played, depth=depth)
     meta = {
         "year": year, "n_players": int(n), "n_weeks": n_weeks,
-        "tier": "nflverse+fantasypros",
-        "espn_file_present": (RAW / f"espn_players_{year}.json").exists(),
+        "tier": data["tier"],
+        "espn_file_present": espn_available(year),
         "ffc_file_present": (RAW / f"ffc_adp_{year}.json").exists(),
-        "calibration_years": cal_years,
+        "calibration_years": data["calibration_years"],
     }
     (CLEAN / f"meta_{year}.json").write_text(json.dumps(meta, indent=2))
     return uni_path, wk_path

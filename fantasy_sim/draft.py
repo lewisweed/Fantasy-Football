@@ -107,8 +107,10 @@ def universal_bias(pid: int, rnd: int, counts: np.ndarray, out: np.ndarray) -> N
         out[RB] += 0.55
 
 
-#: Absolute board penalties, in picks, for redundant positions.
-BACKUP_QB_PENALTY = 34.0
+#: Absolute board penalties, in picks, for redundant positions.  The
+#: quarterback figure is calibrated against the validation check that a league
+#: drafts 20-22 of them, not chosen a priori.
+BACKUP_QB_PENALTY = 20.0
 BACKUP_TE_PENALTY = 30.0
 
 
