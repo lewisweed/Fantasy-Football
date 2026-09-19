@@ -154,7 +154,7 @@ class LeagueSim:
         self.waiver_order = sorted(range(cfg.n_teams),
                                    key=lambda t: -slot_of_team[t])
         self.slot_of_team = slot_of_team
-        self.schedule = make_schedule(rng, cfg.n_teams, cfg.regular_weeks)
+        self.schedule = make_schedule(rng, cfg.n_teams, self.scfg.regular_weeks)
         self.weekly_points = np.zeros((cfg.n_teams, self.n_weeks))
 
     # -- valuation --------------------------------------------------------
@@ -533,7 +533,7 @@ class LeagueSim:
         return pts
 
     def regular_season(self):
-        for week in range(1, self.cfg.regular_weeks + 1):
+        for week in range(1, self.scfg.regular_weeks + 1):
             if week > 1:
                 self.manage_all_ir(week)
                 self.run_waivers(week)
@@ -559,8 +559,7 @@ class LeagueSim:
 
     def playoffs(self):
         seeds = self.seeds()
-        cfg = self.cfg
-        w1, w2, w3 = cfg.playoff_weeks
+        w1, w2, w3 = self.scfg.playoff_weeks
         self.manage_all_ir(w1)
         self.run_waivers(w1)
         self.run_free_agency(w1)
@@ -598,7 +597,7 @@ class LeagueSim:
             "wins": np.array([t.wins for t in self.teams], dtype=np.int8),
             "losses": np.array([t.losses for t in self.teams], dtype=np.int8),
             "pts_for": self.reg_pts_for,
-            "reg_pts": np.array([self.weekly_points[t.tid, :self.cfg.regular_weeks].sum()
+            "reg_pts": np.array([self.weekly_points[t.tid, :self.scfg.regular_weeks].sum()
                                  for t in self.teams]),
             "champion": np.zeros(n, dtype=bool),
             "runner_up": np.zeros(n, dtype=bool),

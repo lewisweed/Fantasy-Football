@@ -39,9 +39,7 @@ class LeagueConfig:
     bench: int = 7
     ir_slots: int = 1
     draft_rounds: int = 16
-    regular_weeks: int = 14
     playoff_teams: int = 6
-    playoff_weeks: tuple = (15, 16, 17)
     byes: int = 2               # top-2 seeds skip round 1
     trades: bool = False
     waiver_system: str = "reset_inverse_standings"   # or "rolling"
@@ -121,8 +119,13 @@ class SeasonConfig:
     round1_positions: tuple = (RB, WR)
     # Rounds 1..n where the restriction applies.
     round1_restricted_rounds: int = 1
-    # Weeks that make up the fantasy season.
+    # The fantasy calendar, which is a property of the season and not of the
+    # league.  The NFL played 17 weeks through 2020 and 18 from 2021, so a
+    # fantasy season that ends in week 16 in 2019 ends in week 17 in 2022 --
+    # and its regular season is a game shorter.
     n_weeks: int = 17
+    regular_weeks: int = 14
+    playoff_weeks: tuple = (15, 16, 17)
     # Season-long ADP calibration: multiplicative stretch applied to the ECR
     # board so simulated ADP lines up with observed draft behaviour.
     adp_sd_floor: float = 0.8
@@ -138,6 +141,14 @@ SEASON_CONFIG = {
     2024: SeasonConfig(year=2024),
     2025: SeasonConfig(year=2025),
 }
+
+#: Seasons the NFL played in 17 weeks, so fantasy ended in week 16.
+SHORT_SEASONS = (2018, 2019, 2020)
+
+
+def short_season(**kw) -> SeasonConfig:
+    """A pre-2021 season: 13-week regular season, final in week 16."""
+    return SeasonConfig(n_weeks=16, regular_weeks=13, playoff_weeks=(14, 15, 16), **kw)
 
 
 def season_config(year: int) -> SeasonConfig:

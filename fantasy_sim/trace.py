@@ -97,7 +97,7 @@ def main(argv=None) -> int:
     out("")
     out("WEEKS")
     for week, tid, starters, pts in tr.lineups:
-        if week <= sim.cfg.regular_weeks:
+        if week <= sim.scfg.regular_weeks:
             opp = int(sim.schedule[week - 1, args.team])
             vs = f"vs {opp:2d} ({sim.weekly_points[opp, week - 1]:5.1f})"
         else:
