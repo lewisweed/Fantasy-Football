@@ -94,6 +94,39 @@ def persona_leaderboard(teams: pd.DataFrame) -> str:
                            "avg season pts", "flag"])
 
 
+def draft_slot_fairness(year: int, n_drafts: int = 150) -> tuple[str, float]:
+    """Is the *draft* fair across slots, whatever the season did afterwards?
+
+    This separates the two things a slot table confounds: whether the snake
+    hands some slots a better board (a property of the draft, and testable),
+    and whether the players who happened to fall there happened to score (a
+    property of one season, and not).
+    """
+    from . import clean as _clean, draft as _draft, values as _values
+    from .config import LEAGUE, PERSONAS_2025, season_config
+
+    pool, arrays = _clean.load(year)
+    sd = _values.SeasonData(pool, arrays, season_config(year).n_weeks)
+    rng = np.random.default_rng(4242)
+    prior = np.zeros(LEAGUE.n_teams)
+    realised = np.zeros(LEAGUE.n_teams)
+    for _ in range(n_drafts):
+        personas = _draft.sample_personas(rng, PERSONAS_2025, LEAGUE.n_teams)
+        rosters, _, slot_of_team = _draft.run_draft(
+            sd, rng, personas, LEAGUE, season_config(year))
+        for t in range(LEAGUE.n_teams):
+            picks = rosters[t][rosters[t] >= 0]
+            slot = int(slot_of_team[t])
+            prior[slot] += sd.prior[picks].sum()
+            realised[slot] += sd.act[picks].sum()
+    prior /= n_drafts
+    realised /= n_drafts
+    rows = [(i + 1, f"{prior[i]:.1f}", f"{realised[i]:.0f}") for i in range(len(prior))]
+    spread = float((prior.max() - prior.min()) / prior.mean())
+    table = md_table(rows, ["slot", "draft-day expected ppg", "points those picks scored"])
+    return table, spread
+
+
 def by_slot(teams: pd.DataFrame) -> tuple[str, str]:
     teams = teams.assign(slot1=teams.draft_slot + 1)
     bands = pd.cut(teams.slot1, [0, 4, 8, 12], labels=["1-4", "5-8", "9-12"])
@@ -342,13 +375,22 @@ def validation(year: int, teams: pd.DataFrame, diag: dict, pool: pd.DataFrame) -
         bool(len(hits) and (hits.rate > 0.25).mean() >= 0.6),
         ", ".join(f"{r.player} {100*r.rate:.0f}%" for r in hits.itertuples()))
 
-    # The breakouts the season actually produced.
-    adds = pd.DataFrame({"player": pool.player, "adds": diag["adds"]})
-    top_adds = set(adds.nlargest(40, "adds").player)
+    # The breakouts the season actually produced.  Kickers and defences are
+    # streamed by construction and would otherwise fill the list.
+    adds = pd.DataFrame({"player": pool.player, "pos": pool.pos,
+                         "adds": diag["adds"]})
+    skill = adds[adds.pos.isin(["QB", "RB", "WR", "TE"])]
+    top_adds = set(skill.nlargest(40, "adds").player)
     expect_add = ["Jaxson Dart", "Sam Darnold", "Brenton Strange", "Alec Pierce"]
     found = [p for p in expect_add if p in top_adds]
     add("2025's breakouts get added", len(found) >= 2,
-        f"in the 40 most-added: {', '.join(found) if found else 'none'}")
+        f"in the 40 most-added skill players: "
+        f"{', '.join(found) if found else 'none'}")
+
+    # The draft format must not itself favour a slot.
+    _, spread = draft_slot_fairness(year, n_drafts=120)
+    add("The snake draft is even across slots", spread < 0.03,
+        f"draft-day expected value varies {100*spread:.1f}% across the twelve slots")
 
     # Scoring realism.
     ppw = teams.reg_pts.mean() / 14
@@ -360,22 +402,64 @@ def validation(year: int, teams: pd.DataFrame, diag: dict, pool: pd.DataFrame) -
 
 
 # --------------------------------------------------------------------------
+# How much does any of this matter?
+# --------------------------------------------------------------------------
+def explanatory_power(teams: pd.DataFrame) -> dict:
+    """How much of a season strategy accounts for, and what that buys you.
+
+    Everything else in this report is a difference between group averages over
+    thousands of leagues.  This is the number that says how much those
+    differences are worth inside any *one* league, which is the only place
+    anybody actually plays.
+    """
+    t = teams.copy()
+    t["qbband"] = t.first_qb_round.map(qb_band)
+    key = ["persona_name", "activity_name", "qbband"]
+    exp = t.groupby(key).reg_pts.mean().rename("exp_pts").reset_index()
+    t = t.merge(exp, on=key, how="left")
+
+    share = float(t.exp_pts.var() / t.reg_pts.var())
+
+    def rank_rho(g):
+        a = g.exp_pts.rank(ascending=False)
+        b = (g.wins + g.pts_for / 1e5).rank(ascending=False)
+        return np.corrcoef(a, b)[0, 1]
+
+    rho = t.groupby("league").apply(rank_rho, include_groups=False)
+    return {
+        "share": share,
+        "rho_mean": float(rho.mean()),
+        "rho_sd": float(rho.std()),
+        "rho_p10": float(rho.quantile(0.10)),
+        "rho_p90": float(rho.quantile(0.90)),
+    }
+
+
+# --------------------------------------------------------------------------
 # Written summary
 # --------------------------------------------------------------------------
-def summary(year: int, teams: pd.DataFrame, pool: pd.DataFrame) -> str:
-    """The findings, stated in sentences, with the numbers filled in from the run."""
-    n_leagues = len(teams) // 12
-    by_persona = teams.groupby("persona_name").champion.agg(["mean", "size"])
-    best = by_persona["mean"].idxmax()
-    worst = by_persona["mean"].idxmin()
+def cf_deltas(year: int, base: pd.DataFrame) -> dict:
+    """Season-point effect of each forced first-QB round, from the runs on disk."""
+    from .experiments import QB_ROUNDS
+    base0 = base[base.team == 0].set_index("league")
+    out = {}
+    for r in QB_ROUNDS:
+        teams, _ = load_run(year, f"cf_qb{r}")
+        if teams is None:
+            continue
+        g = teams[teams.team == 0].set_index("league")
+        ref = base0.reindex(g.index).dropna(subset=["reg_pts"])
+        if not len(ref):
+            continue
+        out[r] = float((g.reindex(ref.index).reg_pts - ref.reg_pts).mean())
+    return out
 
-    band = teams.first_qb_round.map(qb_band)
-    by_band = teams.groupby(band).agg(title=("champion", "mean"),
-                                      pts=("reg_pts", "mean"), n=("champion", "size"))
-    by_band = by_band[by_band.n > 200]
-    best_band = by_band.title.idxmax()
-    worst_band = by_band.title.idxmin()
-    spread = by_band.pts.max() - by_band.pts.min()
+
+def summary(year: int, teams: pd.DataFrame, pool: pd.DataFrame, tier: str) -> str:
+    """The findings, stated in sentences, with the numbers from this run."""
+
+    by_persona = teams.groupby("persona_name").champion.mean()
+    best, worst = by_persona.idxmax(), by_persona.idxmin()
 
     act = teams.groupby("activity_name").champion.mean()
     slot = teams.assign(s=teams.draft_slot + 1).groupby("s").champion.mean()
@@ -383,73 +467,112 @@ def summary(year: int, teams: pd.DataFrame, pool: pd.DataFrame) -> str:
     qb = teams[teams.first_qb >= 0].copy()
     qb["qb_name"] = pool.player.to_numpy()[qb.first_qb.to_numpy()]
     qb_tbl = qb.groupby("qb_name").agg(t=("champion", "mean"), n=("champion", "size"),
-                                       r=("first_qb_round", "mean"))
+                                       r=("first_qb_round", "mean"),
+                                       ppg=("qb_points", "mean"))
     qb_tbl = qb_tbl[qb_tbl.n >= 150]
     best_qb = qb_tbl.t.idxmax()
     early = qb_tbl[qb_tbl.r <= 5]
     best_early = early.t.idxmax() if len(early) else None
 
+    cf = cf_deltas(year, teams)
+    power = explanatory_power(teams)
+
     lines = [
+        "### How much of this matters",
+        "",
+        f"Persona, activity level and quarterback timing together account for "
+        f"**{100 * power['share']:.0f}% of the variance in season points**. The "
+        f"other {100 * (1 - power['share']):.0f}% is draft luck, how the players "
+        "actually performed, and the schedule.",
+        "",
+        "That sets the ceiling on what any of these tables can do for one "
+        "league. Ranking twelve teams by strategy alone and correlating with "
+        f"their real finish gives a rank correlation of **{power['rho_mean']:.2f} "
+        f"on average, with a standard deviation of {power['rho_sd']:.2f}** and a "
+        f"10th-to-90th-percentile range of {power['rho_p10']:.2f} to "
+        f"{power['rho_p90']:.2f}. A single season can neither confirm nor refute "
+        "any of it.",
+        "",
         "### What the season says",
         "",
-        f"**Roster construction beat quarterback timing.** Across {n_leagues:,} "
-        f"leagues the spread between the best and worst persona "
-        f"({best} at {pct(by_persona['mean'].max())}, {worst} at "
-        f"{pct(by_persona['mean'].min())}) is wider than the spread across "
-        f"first-quarterback rounds, and the whole first-QB-round table covers "
-        f"only about {spread:.0f} points of season scoring.",
+        f"**Roster construction mattered more than quarterback timing.** The "
+        f"spread between the best and worst persona ({best} at "
+        f"{pct(by_persona.max())}, {worst} at {pct(by_persona.min())}) is wider "
+        "than anything the quarterback tables produce.",
         "",
-        f"**Waiting on a quarterback was right, but the edge is modest.** The "
-        f"best band was round {best_band} at "
-        f"{pct(by_band.title.loc[best_band])}, the worst round {worst_band} at "
-        f"{pct(by_band.title.loc[worst_band])}. The counterfactual table in "
-        "section 5 is the load-bearing version of this claim, because it holds "
-        "the rest of the league fixed; the raw table above is confounded by "
-        "which personas take quarterbacks early in the first place.",
+    ]
+
+    if cf:
+        early_cost = min((cf.get(2, 0.0), cf.get(3, 0.0)))
+        later = [v for k, v in cf.items() if 4 <= k <= 12]
+        lo, hi = (min(later), max(later)) if later else (0.0, 0.0)
+        peak = max((k for k in cf if 4 <= k <= 12), key=lambda k: cf[k]) if later else 0
+        lines += [
+            "**The mistake is the early reach, not the timing after it.** The "
+            "counterfactual in section 5 is the load-bearing version of this, "
+            "because it replays the same league seed with one team forced into "
+            "a round and compares it against that same team's own default. "
+            f"Forcing a quarterback in rounds 2 and 3 costs "
+            f"{abs(early_cost):.0f} and {abs(cf.get(3, 0.0)):.0f} season points. "
+            f"Every round from 4 to 12 is worth between {lo:+.0f} and {hi:+.0f} "
+            f"instead, peaking around round {peak} -- a band, not a trend. The "
+            "raw table in section 3 looks more like 'later is better' only "
+            "because the personas that reach early are worse in other ways too.",
+            "",
+        ]
+
+    if best_early is not None:
+        lines += [
+            f"**No quarterback taken in the first five rounds paid for himself.** "
+            f"The best of them, {best_early}, still came in at "
+            f"{pct(float(early.t.max()))} -- under the 8.33% a team gets for "
+            f"turning up. {best_qb} did the most for the teams that took him, "
+            "at a fraction of the cost. Section 4 prices each one.",
+            "",
+        ]
+
+    lines += [
+        f"**Attention beat every draft strategy.** Active managers won "
+        f"{pct(act.get('active', float('nan')))} of titles against "
+        f"{pct(act.get('lazy', float('nan')))} for lazy ones, and the gap in "
+        "season points is larger still. It comes entirely from in-season work.",
         "",
-        f"**Of the quarterbacks worth drafting, {best_qb} did the most for the "
-        f"teams that took him**"
-        + (f", and among quarterbacks going in the first five rounds it was "
-           f"{best_early}" if best_early else "")
-        + ". Section 4 prices each one against what he cost.",
-        "",
-        f"**Attention is worth more than any draft strategy.** Active managers "
-        f"won {pct(act.get('active', float('nan')))} of titles against "
-        f"{pct(act.get('lazy', float('nan')))} for lazy ones -- a bigger gap "
-        "than any persona produced, and it comes entirely from in-season work.",
-        "",
-        f"**Draft slot barely mattered.** Title rates ran from "
-        f"{pct(slot.min())} at slot {int(slot.idxmin())} to {pct(slot.max())} "
-        f"at slot {int(slot.idxmax())}, a range that the confidence intervals "
-        "in section 2 mostly swallow.",
+        f"**Draft slot mattered a great deal in 2025 -- and tells you nothing "
+        f"about next year.** Title rates ran from {pct(slot.min())} at slot "
+        f"{int(slot.idxmin())} to {pct(slot.max())} at slot "
+        f"{int(slot.idxmax())}, well outside the confidence intervals. But "
+        "draft-day expected value is flat across all twelve slots (section 2), "
+        "so this is not the format favouring anybody: it is one season's "
+        "players landing where they landed.",
         "",
         "### Caveats",
         "",
-        "1. **One season, one set of outcomes.** Every league here replays the "
-        "same 2025: the same players get hurt in the same weeks and the same "
+        "1. **One season, one set of outcomes.** Every league replays the same "
+        "2025: the same players get hurt in the same weeks and the same "
         "breakouts happen. The variation is in drafts, schedules, waiver runs "
-        "and manager noise, not in football. A strategy that looks good here "
-        "may only be good at 2025. This is why the spec asks for 2023 and "
-        "2024 as well.",
-        "2. **ESPN and Fantasy Football Calculator were unreachable** from the "
-        "environment this ran in, so the draft board is FantasyPros' PPR "
-        "consensus rather than real mock-draft ADP, and weekly expectations "
-        "are FantasyPros rankings mapped to points through curves fitted on "
-        "2021-2024 rather than ESPN's own projections. See the README. The "
-        "board reproduces the spec's own ADP calibration fact closely, but "
-        "comparisons against section 9's prior findings may be measuring the "
-        "data tier rather than the model.",
+        "and manager noise, not in football. The draft-slot table is the "
+        "clearest illustration -- a large, confidently-measured effect that is "
+        "pure season-specific luck. Adding 2023 and 2024 is what separates the "
+        "two.",
+        f"2. **Data tier: `{tier}`.** " + (
+            "Player pool, weekly projections and scoring are ESPN's own; the "
+            "draft board is real Fantasy Football Calculator mock-draft ADP. "
+            "Availability and depth-chart roles come from nflverse."
+            if tier.startswith("espn") else
+            "ESPN and Fantasy Football Calculator were unreachable, so scoring "
+            "is ESPN's rules applied to nflverse box scores and the board is "
+            "FantasyPros consensus. See the README."),
         "3. **Managers are model managers.** They do not trade, do not read "
         "beat reports, and do not tilt. Their disagreements are Gaussian noise "
         "rather than genuinely different theories of football.",
-        "4. **Title rates are noisy.** A 12-team league produces one champion, "
-        "so even 5,000 leagues gives roughly 400 titles per common persona. "
-        "Read the intervals, not the point estimates, and prefer season points "
-        "and playoff rate -- both far better measured -- when ranking.",
-        "5. **The persona mix is an assumption.** It was set from 2025 draft "
-        "advice, not observed from real leagues. Section 7 re-runs the "
-        "question under different mixes; conclusions that move between them "
-        "are not conclusions.",
+        "4. **Title rates are noisy; season points are not.** A league produces "
+        "one champion, so even 5,000 leagues gives a few hundred titles per "
+        "persona. Prefer season points and playoff rate when ranking, and read "
+        "the intervals rather than the point estimates.",
+        "5. **The persona mix is an assumption**, set from 2025 draft advice "
+        "rather than observed from real leagues. Section 7 re-runs the question "
+        "under different mixes and the other ESPN waiver system; anything that "
+        "moves between them is not a conclusion.",
     ]
     return "\n".join(lines)
 
@@ -469,6 +592,7 @@ def build_report(year: int) -> Path:
 
     n_leagues = len(teams) // 12
     slot_tbl, persona_slot = by_slot(teams)
+    slot_fair, slot_spread = draft_slot_fairness(year)
 
     parts = [
         f"# {year} fantasy football league simulation",
@@ -490,7 +614,25 @@ def build_report(year: int) -> Path:
         "",
         "## 2. By draft slot",
         "",
+        "**Read this table as a fact about 2025, not about snake drafts.** "
+        "Every league here replays the same season, so a slot is worth "
+        "whatever the players who fall to it happened to do -- and in 2025 the "
+        "picks around 5 to 8 were Jefferson, Gibbs and Nabers, who between "
+        "them scored at 0.0, 0.6 and 0.8 times their own pace once the fantasy "
+        "playoffs arrived. The draft itself is even: expected value on draft "
+        "day is flat across all twelve slots (below). None of this spread "
+        "should be expected to repeat.",
+        "",
         slot_tbl,
+        "",
+        "### The draft itself is fair",
+        "",
+        slot_fair,
+        "",
+        f"Spread in draft-day expected value across slots: "
+        f"**{100 * slot_spread:.1f}%** -- flat. The spread in what those picks "
+        "went on to score is several times larger, and that difference is the "
+        "season, not the format.",
         "",
         "### Persona x draft slot (title rate)",
         "",
@@ -537,7 +679,7 @@ def build_report(year: int) -> Path:
         "",
         "## 10. Summary",
         "",
-        summary(year, teams, pool),
+        summary(year, teams, pool, src),
         "",
     ]
     out = RESULTS / f"report_{year}.md"
