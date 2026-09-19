@@ -116,6 +116,13 @@
            background:var(--sunken); position:sticky; top:0}
   tbody tr:last-child td{border-bottom:none}
   td.hi{color:var(--accent); font-weight:500}
+  table.playbook td,table.playbook th{white-space:normal}
+  table.playbook td:first-child{min-width:9.5em}
+  table.playbook td.idea{font-family:"Source Serif 4",serif; font-size:.9rem; line-height:1.45;
+    text-align:left; color:var(--ink-2); min-width:22em; max-width:34em}
+  table.playbook th:nth-child(2){text-align:left}
+  table.playbook td:nth-child(n+3){text-align:center}
+  table.playbook th:nth-child(n+3){text-align:center}
   td.lo{color:var(--warm); font-weight:500}
 
   .pull{border-top:2px solid var(--ink); border-bottom:1px solid var(--hair);
@@ -172,6 +179,7 @@
       </dl>
       <nav class="toc">
         <a href="#read">How to read this</a>
+        <a href="#playbooks">The playbooks</a>
         <a href="#strategies">What won</a>
         <a href="#qb">The QB question</a>
         <a href="#which-qb">Which QB</a>
@@ -210,6 +218,46 @@
           <p>How much of the outcome a factor actually accounts for. If draft strategy explains 10% of your season, the other 90% is injuries, breakouts, and who you happened to play each week. It is the honest ceiling on advice.</p>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section id="playbooks">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">The cast</p>
+      <h2>The eleven playbooks</h2>
+      <p>Every simulated manager drafts with one of these. They are <strong>tendencies, not rules</strong> &mdash; a playbook nudges the close calls, and a big enough gap in value overrides it every time, exactly as it would for a person.</p>
+    </div>
+    <div class="wide">
+      <figure>
+        <div class="fh">
+          <h3>What each strategy actually does</h3>
+          <p>The round columns are what the strategy <em>produced</em> in simulation &mdash; the typical round its first quarterback, running back and tight end came off the board &mdash; not what it was instructed to do.</p>
+        </div>
+        <div class="tablewrap" style="border-top:none">
+          <table class="playbook">
+            <thead><tr><th>Strategy</th><th>The idea</th><th>1st QB</th><th>1st RB</th><th>1st TE</th><th>Share of field</th></tr></thead>
+            <tbody>
+<tr><td><strong>Balanced</strong></td><td class="idea">No plan beyond best available. Follows consensus and lets the board decide.</td><td>5</td><td>2</td><td>7</td><td>22%</td></tr>
+<tr><td><strong>Late QB</strong></td><td class="idea">Waits out the quarterback run and takes one once the position gets cheap.</td><td>8</td><td>2</td><td>7</td><td>14%</td></tr>
+<tr><td><strong>Hero RB</strong></td><td class="idea">One expensive back in round 1, then nothing at the position until round 6 while loading up on receivers.</td><td>5</td><td>1</td><td>8</td><td>11%</td></tr>
+<tr><td><strong>Robust RB</strong></td><td class="idea">Running backs early and often &mdash; three or four of the first five picks.</td><td>7&ndash;8</td><td>1</td><td>8</td><td>11%</td></tr>
+<tr><td><strong>Early QB</strong></td><td class="idea">Pays up for a quarterback in the first few rounds to lock the position down.</td><td>3</td><td>2</td><td>7</td><td>9%</td></tr>
+<tr><td><strong>Elite TE</strong></td><td class="idea">Buys one of the two or three tight ends who score like receivers, treating the slot as an edge rather than a hole to fill.</td><td>6</td><td>2</td><td>3</td><td>8%</td></tr>
+<tr><td><strong>Zero RB</strong></td><td class="idea">Refuses to spend early picks on backs at all, on the theory that they get hurt, then takes a pile of them late.</td><td>6</td><td>7</td><td>9</td><td>7%</td></tr>
+<tr><td><strong>Elite QB only</strong></td><td class="idea">Takes a genuinely top-tier quarterback or waits a long time. Never settles for the middle.</td><td>3</td><td>2</td><td>7&ndash;8</td><td>5%</td></tr>
+<tr><td><strong>Backup-QB hoarder</strong></td><td class="idea">Always drafts a second quarterback as injury insurance and a matchup play, at the cost of a bench spot.</td><td>3&ndash;4</td><td>2</td><td>8</td><td>5%</td></tr>
+<tr><td><strong>Elite TE + early QB</strong></td><td class="idea">Both positional premiums at once: an elite tight end, then a top quarterback right after.</td><td>3</td><td>2</td><td>2</td><td>4%</td></tr>
+<tr><td><strong>QB streamer</strong></td><td class="idea">Drafts no real quarterback. Grabs a cheap one very late and swaps by matchup all season.</td><td>11</td><td>2</td><td>7</td><td>4%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figcaption>&ldquo;Share of field&rdquo; is how common the strategy is among the twelve managers, set from published 2025 draft advice. It is an assumption, and every finding on this page was re-tested against different mixes.</figcaption>
+      </figure>
+    </div>
+    <div class="col">
+      <p>Here is the proof that these are tendencies and not scripts. <strong>Zero&nbsp;RB is defined by avoiding running backs</strong> &mdash; and it still takes its first one in round&nbsp;7, with five more after that. When the board hands a manager something too good to pass up, he takes it and adjusts. A strategy that never deviated would be a program, not a person.</p>
     </div>
   </div>
 </section>
@@ -316,7 +364,7 @@
       <figure>
         <div class="fh">
           <h3>Championship rate by how active the manager was</h3>
-          <p>Active managers check waivers every week; lazy managers check about half of them and forget a lineup roughly one week in five.</p>
+          <p><strong>Active</strong> (55% of managers) works the wire every week, submits up to three claims and makes about 18 moves a season. <strong>Moderate</strong> (35%) checks most weeks and makes about 9. <strong>Lazy</strong> (10%) checks roughly half the weeks, makes about 4, and forgets to fix a lineup around one week in five.</p>
         </div>
         <div class="plot"><div id="c-act"></div></div>
         <figcaption>A 4.8-point gap in title rate, and more than a hundred season points &mdash; larger than the distance between the best and worst draft persona. None of it happens on draft day.</figcaption>
