@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Five Thousand Seasons</title>
+<meta name="description" content="What 5,000 simulated 2025 fantasy football seasons say about draft strategy, quarterback timing, and how much any of it actually matters.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231A6FA0'/%3E%3Crect x='5' y='14.5' width='22' height='3' rx='1.5' fill='%23ffffff' fill-opacity='0.55'/%3E%3Ccircle cx='19' cy='16' r='4.5' fill='%23ffffff'/%3E%3C/svg%3E">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sigma Showdown analysis">
+<meta property="og:title" content="Five Thousand Seasons">
+<meta property="og:description" content="What 5,000 simulated 2025 fantasy football seasons say about draft strategy, quarterback timing, and how much any of it actually matters.">
+<meta property="og:url" content="https://lewisweed.github.io/Fantasy-Football/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Five Thousand Seasons">
+<meta name="twitter:description" content="What 5,000 simulated 2025 fantasy football seasons say about draft strategy, quarterback timing, and how much any of it actually matters.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root{
+    --ground:#F3F5F6; --surface:#FFFFFF; --sunken:#E9EDEF;
+    --ink:#12171B; --ink-2:#3C4A53; --muted:#5B6B75; --hair:#DCE3E7;
+    --accent:#1A6FA0; --accent-soft:#1A6FA022; --warm:#C4551F; --warm-soft:#C4551F22;
+    --shadow:0 1px 2px rgba(18,23,27,.06),0 8px 24px -16px rgba(18,23,27,.25);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E1316; --surface:#161C20; --sunken:#1E262B;
+      --ink:#E6EDF1; --ink-2:#BCCAD3; --muted:#93A5B0; --hair:#26313A;
+      --accent:#4A9AC8; --accent-soft:#4A9AC82E; --warm:#D57A42; --warm-soft:#D57A422E;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E1316; --surface:#161C20; --sunken:#1E262B;
+    --ink:#E6EDF1; --ink-2:#BCCAD3; --muted:#93A5B0; --hair:#26313A;
+    --accent:#4A9AC8; --accent-soft:#4A9AC82E; --warm:#D57A42; --warm-soft:#D57A422E;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -18px rgba(0,0,0,.8);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:"Source Serif 4",Georgia,"Times New Roman",serif;
+    font-size:17px; line-height:1.62; margin:0;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{padding-inline:20px; padding-block:0; max-width:1180px; margin:0 auto}
+  .col{max-width:64ch; margin-inline:auto}
+  .wide{max-width:880px; margin-inline:auto}
+
+  h1,h2,h3,.eyebrow,.lede{font-family:"Bricolage Grotesque",system-ui,sans-serif}
+  h1{font-size:clamp(2.3rem,6.2vw,3.9rem); font-weight:800; line-height:1.02;
+     letter-spacing:-.025em; text-wrap:balance; margin:0}
+  h2{font-size:clamp(1.45rem,3.4vw,2rem); font-weight:700; line-height:1.14;
+     letter-spacing:-.018em; text-wrap:balance; margin:0}
+  h3{font-size:1.06rem; font-weight:700; letter-spacing:-.006em; margin:0}
+  p{margin:0}
+  a{color:var(--accent)}
+  strong{font-weight:600}
+  .num{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+
+  .eyebrow{font-size:.72rem; font-weight:600; letter-spacing:.14em;
+           text-transform:uppercase; color:var(--muted)}
+  .lede{font-size:clamp(1.05rem,2.3vw,1.3rem); line-height:1.45; font-weight:600;
+        letter-spacing:-.01em; color:var(--ink-2); text-wrap:pretty}
+
+  header.hero{border-bottom:1px solid var(--hair); background:var(--surface)}
+  header.hero .wrap{padding-block:clamp(40px,7vw,76px)}
+  .hero-stack{display:flex; flex-direction:column; gap:20px; max-width:64ch; margin-inline:auto}
+
+  .keyfacts{display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+            gap:1px; background:var(--hair); border:1px solid var(--hair);
+            border-radius:3px; overflow:hidden; margin-top:6px}
+  .keyfacts div{background:var(--surface); padding:12px 14px}
+  .keyfacts dt{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-size:.66rem;
+               font-weight:600; letter-spacing:.11em; text-transform:uppercase;
+               color:var(--muted); margin:0 0 3px}
+  .keyfacts dd{margin:0; font-family:"IBM Plex Mono",monospace; font-size:1.18rem;
+               font-weight:500; letter-spacing:-.02em}
+
+  section{padding-block:clamp(34px,5.5vw,60px); border-bottom:1px solid var(--hair)}
+  section > .wrap > * + *{margin-top:20px}
+  .col > * + *{margin-top:18px}
+  .sec-head{display:flex; flex-direction:column; gap:8px; max-width:64ch; margin-inline:auto}
+
+  /* definitions */
+  .def{background:var(--surface); border:1px solid var(--hair);
+       border-left:3px solid var(--accent); border-radius:2px;
+       padding:16px 18px; display:flex; flex-direction:column; gap:7px}
+  .def h3{font-size:.95rem}
+  .def p{font-size:.95rem; line-height:1.55; color:var(--ink-2)}
+  .defgrid{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+
+  /* figures */
+  figure{margin:0; background:var(--surface); border:1px solid var(--hair);
+         border-radius:3px; box-shadow:var(--shadow); overflow:hidden}
+  figure .fh{padding:16px 18px 4px; display:flex; flex-direction:column; gap:4px}
+  figure .fh h3{font-size:1rem}
+  figure .fh p{font-size:.86rem; color:var(--muted); line-height:1.45}
+  .plot{padding:10px 14px 16px}
+  .plot svg{display:block; width:100%; height:auto; overflow:visible}
+  figcaption{padding:12px 18px 16px; font-size:.84rem; color:var(--muted);
+             line-height:1.5; border-top:1px solid var(--hair)}
+
+  .tablewrap{overflow-x:auto; border-top:1px solid var(--hair)}
+  table{border-collapse:collapse; width:100%; font-size:.84rem;
+        font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+  th,td{padding:7px 12px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--hair)}
+  th:first-child,td:first-child{text-align:left; font-family:"Source Serif 4",serif;
+                                font-variant-numeric:normal}
+  thead th{font-family:"Bricolage Grotesque",sans-serif; font-size:.68rem; font-weight:600;
+           letter-spacing:.07em; text-transform:uppercase; color:var(--muted);
+           background:var(--sunken); position:sticky; top:0}
+  tbody tr:last-child td{border-bottom:none}
+  td.hi{color:var(--accent); font-weight:500}
+  td.lo{color:var(--warm); font-weight:500}
+
+  .pull{border-top:2px solid var(--ink); border-bottom:1px solid var(--hair);
+        padding-block:16px; display:flex; flex-direction:column; gap:6px}
+  .pull .big{font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
+             font-size:clamp(1.5rem,4vw,2.1rem); line-height:1.1; letter-spacing:-.02em}
+  .pull .sub{font-size:.92rem; color:var(--muted)}
+
+  ol.steps{margin:0; padding-left:0; list-style:none; counter-reset:s;
+           display:flex; flex-direction:column; gap:14px}
+  ol.steps li{counter-increment:s; display:grid; grid-template-columns:28px 1fr; gap:12px;
+              font-size:.97rem; line-height:1.55}
+  ol.steps li::before{content:counter(s); font-family:"IBM Plex Mono",monospace;
+    font-size:.78rem; font-weight:500; color:var(--accent); border:1px solid var(--hair);
+    border-radius:2px; width:28px; height:24px; display:grid; place-items:center}
+
+  ul.plain{margin:0; padding-left:1.1em; display:flex; flex-direction:column; gap:9px}
+  ul.plain li{font-size:.97rem; line-height:1.55}
+
+  footer{padding-block:34px; font-size:.86rem; color:var(--muted)}
+  footer .wrap{display:flex; flex-direction:column; gap:8px; max-width:64ch}
+
+  .toc{display:flex; flex-wrap:wrap; gap:7px; margin-top:4px}
+  .toc a{font-family:"IBM Plex Mono",monospace; font-size:.75rem; text-decoration:none;
+         border:1px solid var(--hair); background:var(--surface); color:var(--ink-2);
+         padding:5px 9px; border-radius:2px}
+  .toc a:hover{border-color:var(--accent); color:var(--accent)}
+  a:focus-visible,.toc a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  .swatch{display:inline-block; width:9px; height:9px; border-radius:2px; vertical-align:baseline}
+  .legend{display:flex; flex-wrap:wrap; gap:14px; padding:0 18px 4px;
+          font-size:.78rem; color:var(--muted); font-family:"IBM Plex Mono",monospace}
+  .legend span{display:inline-flex; align-items:center; gap:6px}
+
+  g.mark{transition:opacity .12s ease}
+  svg:hover g.mark{opacity:.45}
+  svg g.mark:hover{opacity:1}
+  @media (prefers-reduced-motion:reduce){g.mark{transition:none}}
+  @media (max-width:560px){ body{font-size:16px} .keyfacts dd{font-size:1.02rem} }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-stack">
+      <p class="eyebrow">A fantasy football experiment &middot; 2025 season</p>
+      <h1>Five Thousand Seasons</h1>
+      <p class="lede">We rebuilt the 2025 fantasy season inside a computer and played it five thousand times, with twelve managers drafting, streaming and setting lineups in every one. Here is what actually won &mdash; and how much of it was luck.</p>
+      <dl class="keyfacts">
+        <div><dt>Leagues played</dt><dd>5,000</dd></div>
+        <div><dt>Teams managed</dt><dd>60,000</dd></div>
+        <div><dt>Format</dt><dd>12-tm PPR</dd></div>
+        <div><dt>Real season</dt><dd>2025</dd></div>
+      </dl>
+      <nav class="toc">
+        <a href="#read">How to read this</a>
+        <a href="#strategies">What won</a>
+        <a href="#qb">The QB question</a>
+        <a href="#which-qb">Which QB</a>
+        <a href="#effort">Effort</a>
+        <a href="#slot">Draft slot</a>
+        <a href="#matters">Does any of it matter</a>
+        <a href="#how">How it works</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section id="read">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Start here</p>
+      <h2>How to read the numbers</h2>
+      <p>Four ideas do all the work on this page. None of them are complicated, but every chart below assumes you know them.</p>
+    </div>
+    <div class="col">
+      <div class="defgrid">
+        <div class="def">
+          <h3>Fair share &mdash; 8.33%</h3>
+          <p>Twelve teams, one champion. If every manager were identical, each would win <span class="num">1&divide;12&nbsp;=&nbsp;8.33%</span> of the time. That is the line to beat. A strategy at 6% is <em>losing</em> to a manager who does nothing in particular; a strategy at 10% is genuinely ahead.</p>
+        </div>
+        <div class="def">
+          <h3>Confidence interval</h3>
+          <p>The range the true number probably sits in, written like <span class="num">9.9&ndash;11.7%</span>. We only played 5,000 seasons, not infinite ones, so every figure has some wobble. <strong>If two intervals overlap, the two things are not meaningfully different</strong> &mdash; that is the single most useful habit for reading this page.</p>
+        </div>
+        <div class="def">
+          <h3>Counterfactual</h3>
+          <p>Replaying <em>the same league</em> with one thing changed. We re-ran each season with one manager forced to draft a quarterback in a set round, everything else untouched, and compared him to himself. It is the difference between &ldquo;teams that did X won more&rdquo; and &ldquo;doing X makes you win more&rdquo; &mdash; which are not the same claim.</p>
+        </div>
+        <div class="def">
+          <h3>Variance explained</h3>
+          <p>How much of the outcome a factor actually accounts for. If draft strategy explains 10% of your season, the other 90% is injuries, breakouts, and who you happened to play each week. It is the honest ceiling on advice.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="strategies">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Question one</p>
+      <h2>Which draft strategy wins?</h2>
+      <p>Each simulated manager drafts with a persona &mdash; a tendency, not a rule. A Zero&nbsp;RB manager avoids running backs early but will still take one if the value is obvious, exactly like a real person would.</p>
+    </div>
+    <div class="wide">
+      <figure>
+        <div class="fh">
+          <h3>Championship rate by draft persona</h3>
+          <p>Dot is the estimate; the bar is the 95% confidence interval. Orange marks a strategy whose <em>whole</em> interval sits below fair share.</p>
+        </div>
+        <div class="plot"><div id="c-persona"></div></div>
+        <figcaption>Read the bars, not the dots. Elite&nbsp;TE, QB&nbsp;streamer and Robust&nbsp;RB all clear fair share; their intervals overlap each other, so treating them as a three-way tie is more honest than ranking them. Zero&nbsp;RB is the only persona that is unambiguously bad.</figcaption>
+        <div class="tablewrap">
+          <table id="t-persona"><thead><tr><th>Persona</th><th>Title&nbsp;%</th><th>95% CI</th><th>&times;&nbsp;fair share</th><th>Playoffs&nbsp;%</th><th>Season pts</th></tr></thead><tbody></tbody></table>
+        </div>
+      </figure>
+    </div>
+    <div class="col">
+      <div class="pull">
+        <p class="big">Zero RB didn&rsquo;t just lose finals. It missed the playoffs.</p>
+        <p class="sub">Zero RB made the playoffs 39.9% of the time against roughly 50% for everyone else. It lost in the regular season, which means the strategy failed &mdash; not that it ran into bad luck in December.</p>
+      </div>
+      <p>The spread from best to worst here is wider than anything the quarterback tables produce. Whatever you take from this page, <strong>how you build the rest of the roster mattered more than when you took a quarterback.</strong></p>
+    </div>
+  </div>
+</section>
+
+<section id="qb">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Question two</p>
+      <h2>When should you draft a quarterback?</h2>
+      <p>This is the question the project was built for, and it is the one where the obvious answer is wrong in an interesting way.</p>
+    </div>
+    <div class="col">
+      <p>The tempting approach is to sort teams by when they took their first quarterback and compare. Do that and you get a clean story: rounds 2&ndash;3 won 5.98% of titles, rounds 10 and later won 9.90%. Wait, obviously.</p>
+      <p>But that comparison is contaminated. The managers who reach for a quarterback in round&nbsp;2 are <em>also</em> the managers doing other things differently, and those other things are in the number too. To separate them you have to replay the same league and change only one thing.</p>
+    </div>
+    <div class="wide">
+      <figure>
+        <div class="fh">
+          <h3>What forcing a quarterback into a given round actually costs</h3>
+          <p>Season points gained or lost against the same manager, in the same league, drafting his own way. Bars are 95% confidence intervals.</p>
+        </div>
+        <div class="legend">
+          <span><span class="swatch" style="background:var(--warm)"></span> worse than drafting naturally</span>
+          <span><span class="swatch" style="background:var(--accent)"></span> better</span>
+        </div>
+        <div class="plot"><div id="c-cf"></div></div>
+        <figcaption>Rounds 2 and 3 are real mistakes, costing 18 and 12 points across a season. Every round from 4 to 12 is worth roughly the same as every other &mdash; a plateau, not a slope. The lesson is &ldquo;don&rsquo;t reach,&rdquo; not &ldquo;wait as long as possible.&rdquo;</figcaption>
+      </figure>
+    </div>
+    <div class="col">
+      <div class="pull">
+        <p class="big">The mistake is the early reach, not the timing after it.</p>
+        <p class="sub">Round 5 looks like the peak, but rounds 4 through 12 all sit inside each other&rsquo;s intervals. Anywhere in that range is fine. Rounds 2 and 3 are not.</p>
+      </div>
+      <p>There is a second clue in the raw data that points the same way. Teams that spent a round-2 pick on a quarterback got <span class="num">18.2</span> points a game out of the position. Teams that waited until round 10 or later got <span class="num">17.6</span>. <strong>Paying up bought about half a point a game.</strong> It cost a pick that could have been a starting running back.</p>
+    </div>
+  </div>
+</section>
+
+<section id="which-qb">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Question two, continued</p>
+      <h2>Which quarterbacks were worth it?</h2>
+      <p>The same question asked player by player: what did he cost, and what did the teams that drafted him actually do?</p>
+    </div>
+    <div class="wide">
+      <figure>
+        <div class="fh">
+          <h3>Draft cost against championship rate</h3>
+          <p>Each dot is the first quarterback a team drafted. Horizontal line is fair share.</p>
+        </div>
+        <div class="plot"><div id="c-qbs"></div></div>
+        <figcaption>Everything above the line returned more than an average team wins by default; everything below returned less. The five quarterbacks drafted in the first four rounds are all beneath it.</figcaption>
+      </figure>
+    </div>
+    <div class="col">
+      <p><strong>Josh Allen is the clearest case on the page.</strong> He scored <span class="num">21.9</span> points a game, the most of any quarterback in the simulation, and did exactly what you drafted him to do. Teams that opened with him still won just <span class="num">7.28%</span> of titles &mdash; below the 8.33% you get for showing up. The pick worked and the team still lost ground, because a round-2 pick spent on a quarterback is a running back or receiver you do not have.</p>
+      <p>Drake Maye, typically available around round&nbsp;11, delivered <span class="num">19.3</span> points a game and a <span class="num">13.25%</span> title rate &mdash; the best on the board, at a twentieth of the cost.</p>
+      <div class="tablewrap" style="border:1px solid var(--hair); border-radius:3px; background:var(--surface)">
+        <table id="t-qbs"><thead><tr><th>First QB drafted</th><th>Avg round</th><th>Title&nbsp;%</th><th>QB pts/gm</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="effort">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">The thing nobody drafts for</p>
+      <h2>Paying attention beat every draft strategy</h2>
+    </div>
+    <div class="wide">
+      <figure>
+        <div class="fh">
+          <h3>Championship rate by how active the manager was</h3>
+          <p>Active managers check waivers every week; lazy managers check about half of them and forget a lineup roughly one week in five.</p>
+        </div>
+        <div class="plot"><div id="c-act"></div></div>
+        <figcaption>A 4.8-point gap in title rate, and more than a hundred season points &mdash; larger than the distance between the best and worst draft persona. None of it happens on draft day.</figcaption>
+        <div class="tablewrap">
+          <table id="t-act"><thead><tr><th>Manager</th><th>Title&nbsp;%</th><th>95% CI</th><th>Playoffs&nbsp;%</th><th>Season pts</th><th>Moves</th></tr></thead><tbody></tbody></table>
+        </div>
+      </figure>
+    </div>
+    <div class="col">
+      <p>This is the least glamorous finding and probably the most useful one. The draft is a single afternoon that everyone agonises over; the waiver wire is fourteen small decisions that most people skip.</p>
+    </div>
+  </div>
+</section>
+
+<section id="slot">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">A trap worth naming</p>
+      <h2>Draft slot mattered enormously &mdash; and tells you nothing</h2>
+    </div>
+    <div class="col">
+      <p>Teams picking 9th through 12th won <span class="num">10.34%</span> of titles. Teams picking 5th through 8th won <span class="num">6.62%</span>. That gap is far too large to be noise, and it is completely useless as advice.</p>
+      <p>Here is why. Every one of these 5,000 leagues replays the <em>same</em> 2025 season &mdash; the same players get hurt in the same weeks. In 2025, picks 5 through 8 were Justin Jefferson, Jahmyr Gibbs and Malik Nabers. Once the fantasy playoffs arrived, those three scored at <span class="num">0.76</span>, <span class="num">0.59</span> and <span class="num">0.00</span> times their own earlier pace. Nabers had torn his ACL.</p>
+      <p>We checked that this was the season and not the format: measured on draft day, expected value is flat across all twelve slots, varying by <span class="num">1.9%</span>. The snake is fair. 2025 simply wasn&rsquo;t.</p>
+      <div class="pull">
+        <p class="big">A large, confidently-measured effect that will never repeat.</p>
+        <p class="sub">This is the clearest illustration on the page of why a single season &mdash; even one played 5,000 times &mdash; cannot tell you what to do next year.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="matters">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">The honest part</p>
+      <h2>How much of this actually matters?</h2>
+    </div>
+    <div class="col">
+      <p>Put draft persona, quarterback timing and manager effort together and they account for about <strong>10% of the variation in how much a team scores</strong>. The other 90% is which players got hurt, which unknowns broke out, and who you drew each week.</p>
+      <p>We tested what that ceiling means in practice. Rank twelve teams by strategy alone, then compare that ranking to how they really finished. Across thousands of leagues the agreement averages <span class="num">0.21</span> on a scale where 1 is perfect and 0 is random &mdash; and it swings by <span class="num">&plusmn;0.29</span>, so a completely backwards prediction is a normal outcome.</p>
+      <div class="def">
+        <h3>What that means for your league</h3>
+        <p>Everything on this page is real: the differences held up across 5,000 leagues, two different waiver systems and three different mixes of opponents. But they are small compared to one year of football. A manager following every recommendation here will still lose most seasons, and the manager who ignores all of it will sometimes win. <strong>The advice shifts the odds; it does not decide the season.</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Method</p>
+      <h2>How the simulation works</h2>
+      <p>Every league is a complete season played from the draft to the final, using the real 2025 numbers.</p>
+    </div>
+    <div class="col">
+      <ol class="steps">
+        <li><strong>Draft.</strong> Sixteen rounds, snake order, random slots. Each manager reads the board through his own noise, so nobody has the same rankings. Draft costs come from Fantasy Football Calculator&rsquo;s record of 8,470 real mock drafts.</li>
+        <li><strong>Play the weeks.</strong> Scoring, weekly projections and player availability are ESPN&rsquo;s own, cross-checked against official injury reports and NFL rosters.</li>
+        <li><strong>Work the wire.</strong> Every week, managers value their squad, set lineups, stash the injured and submit waiver claims under ESPN&rsquo;s real priority rules. They judge a move by whether the <em>roster</em> improves, not by comparing two players in isolation &mdash; which is why they keep handcuffs and bench depth.</li>
+        <li><strong>Finish the season.</strong> Fourteen head-to-head weeks, then a six-team playoff with byes for the top two seeds.</li>
+      </ol>
+      <h3 style="margin-top:26px">Nothing knows the future</h3>
+      <p>The hardest part was keeping hindsight out. Projection sources quietly blank out a player&rsquo;s week once he is known to have missed it &mdash; <strong>including the week he got hurt mid-game</strong>. Joe Burrow&rsquo;s week 2 arrived showing a projection of zero and seven points actually scored. Left alone, that hands every simulated manager a warning nobody had on the Sunday morning. Those weeks are repaired; a manager only knows a player is out when the official injury report or the roster said so before kickoff.</p>
+      <h3 style="margin-top:26px">Checks it had to pass</h3>
+      <ul class="plain">
+        <li>Simulated draft positions match real mock-draft data at <span class="num">r&nbsp;=&nbsp;0.93</span>, within about 5 picks across the top 100.</li>
+        <li><span class="num">20.4</span> quarterbacks drafted per league, matching real 12-team behaviour.</li>
+        <li>Teams score <span class="num">112</span> points a week, which is what an ESPN PPR league looks like.</li>
+        <li>2025&rsquo;s busts get dropped (Joe Mixon 99% of the time) and its breakouts get picked up.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section style="border-bottom:none">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Caveats</p>
+      <h2>What this can&rsquo;t tell you</h2>
+    </div>
+    <div class="col">
+      <ul class="plain">
+        <li><strong>It is one season, played many times.</strong> The variety is in drafts, schedules and waiver runs &mdash; not in football. A strategy that looks good here may only be good at 2025. Running 2023 and 2024 is what separates a real edge from one year&rsquo;s luck.</li>
+        <li><strong>The managers are model managers.</strong> They don&rsquo;t trade, don&rsquo;t read beat reports and don&rsquo;t tilt. Their disagreements are statistical noise rather than genuinely different opinions about football.</li>
+        <li><strong>Championship rates are noisy by nature.</strong> One champion per league means even 5,000 seasons gives only a few hundred titles per strategy. Season points and playoff rate are measured far better &mdash; prefer them when ranking.</li>
+        <li><strong>The mix of opponents is an assumption</strong>, built from published 2025 draft advice rather than observed from real leagues. Every finding here was re-run against different mixes; anything that moved between them was dropped.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>5,000 simulated leagues &middot; 60,000 team-seasons &middot; 244,800 including the counterfactual and sensitivity runs. Every figure is reproducible from a single random seed.</p>
+    <p>Player data from ESPN and Fantasy Football Calculator; injuries, rosters and schedules from nflverse.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg";
+  function el(n,a){var e=document.createElementNS(NS,n);for(var k in a){if(a[k]!==null&&a[k]!==undefined)e.setAttribute(k,a[k]);}return e;}
+  function txt(e,s){e.appendChild(document.createTextNode(s));return e;}
+  function tip(g,s){var t=document.createElementNS(NS,"title");t.textContent=s;g.appendChild(t);}
+  function svg(host,w,h){
+    var s=el("svg",{viewBox:"0 0 "+w+" "+h,role:"img","aria-hidden":"false"});
+    host.appendChild(s);return s;
+  }
+  var INK="var(--ink)",MUT="var(--muted)",HAIR="var(--hair)",ACC="var(--accent)",WARM="var(--warm)";
+  var MONO='"IBM Plex Mono",monospace';
+
+  var PERSONA=[
+    ["Elite TE",10.74,9.89,11.66,53.91,1586],
+    ["QB streamer",10.30,9.17,11.56,51.19,1576],
+    ["Robust RB",10.13,9.42,10.88,56.39,1595],
+    ["Late QB",9.17,8.57,9.80,50.68,1577],
+    ["Balanced",8.40,7.94,8.89,50.11,1573],
+    ["Hero RB",8.17,7.54,8.85,50.64,1578],
+    ["Backup-QB hoarder",7.87,6.97,8.87,49.81,1572],
+    ["Elite TE + early QB",7.53,6.54,8.65,48.15,1564],
+    ["Early QB",6.85,6.21,7.56,47.03,1561],
+    ["Elite QB only",6.22,5.40,7.14,45.64,1559],
+    ["Zero RB",4.08,3.52,4.74,39.94,1533]
+  ];
+  var CF=[[2,-18.1,-23.5,-12.7],[3,-11.8,-16.2,-7.4],[4,8.5,3.7,13.3],[5,16.6,11.8,21.5],
+    [6,9.4,4.5,14.2],[7,4.7,0.0,9.4],[8,7.4,2.9,12.0],[9,6.2,1.7,10.8],
+    [10,7.5,2.9,12.1],[11,7.6,3.1,12.2],[12,8.8,4.2,13.3]];
+  var QBS=[
+    ["Lamar Jackson",2.4,4.26,17.1],["Josh Allen",2.6,7.28,21.9],["Joe Burrow",3.0,6.32,16.3],
+    ["Jayden Daniels",3.1,6.73,17.0],["Jalen Hurts",3.6,6.65,18.7],["Patrick Mahomes",5.1,9.75,19.5],
+    ["Baker Mayfield",5.5,9.31,17.2],["Bo Nix",7.0,10.42,17.7],["Brock Purdy",7.9,10.97,17.4],
+    ["Dak Prescott",8.3,10.31,17.7],["Kyler Murray",8.6,8.02,16.9],["Jared Goff",9.5,9.92,17.5],
+    ["Caleb Williams",10.4,9.88,18.3],["Justin Herbert",10.8,10.58,18.1],["J.J. McCarthy",11.0,9.29,17.0],
+    ["Justin Fields",11.1,10.02,17.1],["Drake Maye",11.3,13.25,19.3]
+  ];
+  var ACT=[["Active",9.45,9.14,9.77,55.70,1597,17.6],
+           ["Moderate",7.64,7.28,8.01,46.03,1558,9.2],
+           ["Lazy",4.61,4.11,5.17,32.32,1493,4.0]];
+  var FAIR=8.333;
+
+  /* ---- horizontal interval chart ---- */
+  function rangeChart(id,rows,opts){
+    var host=document.getElementById(id); if(!host)return;
+    var L=opts.gutter, R=22, T=26, rowH=opts.rowH||26, W=720;
+    var H=T+rows.length*rowH+30;
+    var s=svg(host,W,H);
+    var lo=opts.min, hi=opts.max, span=hi-lo;
+    function x(v){return L+(v-lo)/span*(W-L-R);}
+    for(var t=Math.ceil(lo/opts.step)*opts.step;t<=hi+1e-9;t+=opts.step){
+      s.appendChild(el("line",{x1:x(t).toFixed(1),x2:x(t).toFixed(1),y1:T-8,y2:T+rows.length*rowH-4,
+        stroke:HAIR,"stroke-width":1}));
+      s.appendChild(txt(el("text",{x:x(t).toFixed(1),y:T+rows.length*rowH+14,"text-anchor":"middle",
+        fill:MUT,"font-size":10,"font-family":MONO}),opts.fmt(t)));
+    }
+    if(opts.refAt!==undefined){
+      s.appendChild(el("line",{x1:x(opts.refAt).toFixed(1),x2:x(opts.refAt).toFixed(1),y1:T-14,
+        y2:T+rows.length*rowH-4,stroke:INK,"stroke-width":1.5,"stroke-dasharray":"3 3"}));
+      s.appendChild(txt(el("text",{x:x(opts.refAt).toFixed(1),y:T-19,"text-anchor":"middle",fill:INK,
+        "font-size":10,"font-weight":600,"font-family":MONO}),opts.refLabel));
+    }
+    rows.forEach(function(r,i){
+      var cy=T+i*rowH+rowH/2-2, c=opts.color(r);
+      var g=el("g",{class:"mark"});
+      tip(g,r[0]+": "+opts.fmt(r[1])+"  (95% CI "+opts.fmt(r[2])+" to "+opts.fmt(r[3])+")");
+      g.appendChild(el("rect",{x:x(r[2]).toFixed(1),y:cy-4,width:Math.max(2,x(r[3])-x(r[2])).toFixed(1),
+        height:8,rx:4,fill:c,"fill-opacity":.28}));
+      g.appendChild(el("line",{x1:x(r[2]).toFixed(1),x2:x(r[3]).toFixed(1),y1:cy,y2:cy,stroke:c,"stroke-width":2}));
+      g.appendChild(el("circle",{cx:x(r[1]).toFixed(1),cy:cy,r:5,fill:c,stroke:"var(--surface)","stroke-width":2}));
+      g.appendChild(txt(el("text",{x:L-10,y:cy+4,"text-anchor":"end",fill:INK,"font-size":12,
+        "font-family":'"Source Serif 4",serif'}),r[0]));
+      g.appendChild(txt(el("text",{x:(W-R+4),y:cy+4,"text-anchor":"start",fill:MUT,"font-size":10,
+        "font-family":MONO}),opts.fmt(r[1])));
+      s.appendChild(g);
+    });
+  }
+
+  rangeChart("c-persona",PERSONA,{
+    gutter:150,min:3,max:12.5,step:2,refAt:FAIR,refLabel:"fair share 8.33%",
+    fmt:function(v){return v.toFixed(1)+"%";},
+    color:function(r){return r[3]<FAIR?WARM:ACC;}
+  });
+  rangeChart("c-act",ACT,{
+    gutter:92,min:3,max:10.5,step:2,rowH:34,refAt:FAIR,refLabel:"fair share 8.33%",
+    fmt:function(v){return v.toFixed(1)+"%";},
+    color:function(r){return r[3]<FAIR?WARM:ACC;}
+  });
+
+  /* ---- counterfactual: vertical dot-and-interval around zero ---- */
+  (function(){
+    var host=document.getElementById("c-cf"); if(!host)return;
+    var W=720,T=22,B=44,L=46,R=16,H=320;
+    var s=svg(host,W,H);
+    var lo=-26,hi=24,span=hi-lo;
+    function y(v){return T+(hi-v)/span*(H-T-B);}
+    var n=CF.length, colW=(W-L-R)/n;
+    function cx(i){return L+colW*(i+0.5);}
+    for(var t=-25;t<=20;t+=5){
+      s.appendChild(el("line",{x1:L,x2:W-R,y1:y(t).toFixed(1),y2:y(t).toFixed(1),stroke:HAIR,"stroke-width":1}));
+      s.appendChild(txt(el("text",{x:L-8,y:(y(t)+3.5).toFixed(1),"text-anchor":"end",fill:MUT,
+        "font-size":10,"font-family":MONO}),(t>0?"+":"")+t));
+    }
+    s.appendChild(el("line",{x1:L,x2:W-R,y1:y(0).toFixed(1),y2:y(0).toFixed(1),stroke:INK,"stroke-width":1.5}));
+    s.appendChild(txt(el("text",{x:W-R,y:(y(0)-7).toFixed(1),"text-anchor":"end",fill:INK,"font-size":10,
+      "font-weight":600,"font-family":MONO}),"drafting naturally"));
+    s.appendChild(txt(el("text",{x:14,y:H/2-20,fill:MUT,"font-size":10,"font-family":MONO,
+      transform:"rotate(-90 14 "+(H/2-20)+")","text-anchor":"middle"}),"season points"));
+    CF.forEach(function(r,i){
+      var c=r[1]<0?WARM:ACC, X=cx(i);
+      var g=el("g",{class:"mark"});
+      tip(g,"First QB in round "+r[0]+": "+(r[1]>0?"+":"")+r[1].toFixed(1)+" season points (95% CI "
+        +(r[2]>0?"+":"")+r[2].toFixed(1)+" to "+(r[3]>0?"+":"")+r[3].toFixed(1)+")");
+      g.appendChild(el("rect",{x:(X-4).toFixed(1),y:y(r[3]).toFixed(1),width:8,
+        height:Math.max(2,y(r[2])-y(r[3])).toFixed(1),rx:4,fill:c,"fill-opacity":.28}));
+      g.appendChild(el("line",{x1:X.toFixed(1),x2:X.toFixed(1),y1:y(r[2]).toFixed(1),y2:y(r[3]).toFixed(1),
+        stroke:c,"stroke-width":2}));
+      g.appendChild(el("circle",{cx:X.toFixed(1),cy:y(r[1]).toFixed(1),r:5,fill:c,
+        stroke:"var(--surface)","stroke-width":2}));
+      g.appendChild(txt(el("text",{x:X.toFixed(1),y:H-B+18,"text-anchor":"middle",fill:MUT,"font-size":11,
+        "font-family":MONO}),r[0]));
+      s.appendChild(g);
+    });
+    s.appendChild(txt(el("text",{x:(L+(W-L-R)/2).toFixed(1),y:H-B+34,"text-anchor":"middle",fill:MUT,
+      "font-size":10,"font-family":MONO}),"round the first quarterback was forced into"));
+  })();
+
+  /* ---- QB scatter ---- */
+  (function(){
+    var host=document.getElementById("c-qbs"); if(!host)return;
+    var W=720,H=360,T=22,B=48,L=46,R=100;
+    var s=svg(host,W,H);
+    var xlo=1.5,xhi=12.2,ylo=3.5,yhi=14;
+    function X(v){return L+(v-xlo)/(xhi-xlo)*(W-L-R);}
+    function Y(v){return T+(yhi-v)/(yhi-ylo)*(H-T-B);}
+    for(var t=4;t<=14;t+=2){
+      s.appendChild(el("line",{x1:L,x2:W-R,y1:Y(t).toFixed(1),y2:Y(t).toFixed(1),stroke:HAIR,"stroke-width":1}));
+      s.appendChild(txt(el("text",{x:L-8,y:(Y(t)+3.5).toFixed(1),"text-anchor":"end",fill:MUT,"font-size":10,
+        "font-family":MONO}),t+"%"));
+    }
+    for(var r2=2;r2<=12;r2+=2){
+      s.appendChild(txt(el("text",{x:X(r2).toFixed(1),y:H-B+18,"text-anchor":"middle",fill:MUT,"font-size":10,
+        "font-family":MONO}),"R"+r2));
+    }
+    s.appendChild(el("line",{x1:L,x2:W-R,y1:Y(FAIR).toFixed(1),y2:Y(FAIR).toFixed(1),stroke:INK,
+      "stroke-width":1.5,"stroke-dasharray":"3 3"}));
+    s.appendChild(txt(el("text",{x:W-R+6,y:(Y(FAIR)+3.5).toFixed(1),"text-anchor":"start",fill:INK,
+      "font-size":10,"font-weight":600,"font-family":MONO}),"fair share"));
+    s.appendChild(txt(el("text",{x:(L+(W-L-R)/2).toFixed(1),y:H-B+34,"text-anchor":"middle",fill:MUT,
+      "font-size":10,"font-family":MONO}),"average round he was drafted  →  cheaper"));
+    s.appendChild(txt(el("text",{x:14,y:H/2-24,fill:MUT,"font-size":10,"font-family":MONO,
+      transform:"rotate(-90 14 "+(H/2-24)+")","text-anchor":"middle"}),"championship rate"));
+    var NAMED={"Josh Allen":[9,-9],"Lamar Jackson":[9,4],"Drake Maye":[-9,-9],"Patrick Mahomes":[-9,-8],
+      "Brock Purdy":[0,-12],"Joe Burrow":[-9,5]};
+    QBS.forEach(function(q){
+      var c=q[2]<FAIR?WARM:ACC;
+      var g=el("g",{class:"mark"});
+      tip(g,q[0]+" — drafted round "+q[1].toFixed(1)+", "+q[2].toFixed(2)+"% titles, "+q[3].toFixed(1)+" pts/game");
+      g.appendChild(el("circle",{cx:X(q[1]).toFixed(1),cy:Y(q[2]).toFixed(1),r:5.5,fill:c,
+        stroke:"var(--surface)","stroke-width":2}));
+      var off=NAMED[q[0]];
+      if(off){
+        g.appendChild(txt(el("text",{x:(X(q[1])+off[0]).toFixed(1),y:(Y(q[2])+off[1]).toFixed(1),
+          "text-anchor":off[0]<0?"end":(off[0]===0?"middle":"start"),fill:INK,"font-size":11,
+          "font-family":'"Source Serif 4",serif'}),q[0]));
+      }
+      s.appendChild(g);
+    });
+  })();
+
+  /* ---- tables ---- */
+  function fill(id,rows,cells){
+    var tb=document.querySelector("#"+id+" tbody"); if(!tb)return;
+    rows.forEach(function(r){
+      var tr=document.createElement("tr");
+      cells(r).forEach(function(c){
+        var td=document.createElement("td");
+        if(typeof c==="object"){td.textContent=c.v; if(c.cls)td.className=c.cls;}
+        else td.textContent=c;
+        tr.appendChild(td);
+      });
+      tb.appendChild(tr);
+    });
+  }
+  fill("t-persona",PERSONA,function(r){
+    return [r[0],
+      {v:r[1].toFixed(2)+"%",cls:r[2]>FAIR?"hi":(r[3]<FAIR?"lo":"")},
+      r[2].toFixed(2)+"–"+r[3].toFixed(2)+"%",
+      (r[1]/ (100/12)).toFixed(2)+"×",
+      r[4].toFixed(1)+"%", Math.round(r[5])];
+  });
+  fill("t-act",ACT,function(r){
+    return [r[0],{v:r[1].toFixed(2)+"%",cls:r[2]>FAIR?"hi":(r[3]<FAIR?"lo":"")},
+      r[2].toFixed(2)+"–"+r[3].toFixed(2)+"%",r[4].toFixed(1)+"%",Math.round(r[5]),r[6].toFixed(1)];
+  });
+  fill("t-qbs",QBS.slice().sort(function(a,b){return b[2]-a[2];}),function(r){
+    return [r[0],r[1].toFixed(1),{v:r[2].toFixed(2)+"%",cls:r[2]>FAIR?"hi":"lo"},r[3].toFixed(1)];
+  });
+})();
+</script>
+</body>
+</html>
