@@ -336,26 +336,38 @@ class LeagueSim:
         return out
 
     def why(self, add: int, drop: int, week: int, gain: float, kind: str) -> tuple:
-        """A human-readable reason for a move, for the trace.
+        """Human-readable reasons for the drop and the add, for the trace.
 
-        Purely descriptive -- it never feeds back into the decision.
+        Purely descriptive -- none of it feeds back into the decision.
         """
-        sd, w = self.sd, week - 1
         from .config import DST, K
-        tags = []
+        sd, w = self.sd, week - 1
+
+        drop_tags = []
         if sd.injured[drop, w]:
-            tags.append(f"dropping an injured player (out {sd.out_streak[drop, w]}w)")
-        if sd.pos[add] in (K, DST):
-            tags.append("streaming")
+            n = int(sd.out_streak[drop, w])
+            drop_tags.append("injured, out this week" if n == 0
+                             else f"injured, out {n + 1} weeks")
+        elif sd.is_bye[drop, w]:
+            drop_tags.append("on bye")
+        if sd.pos[drop] in (K, DST):
+            drop_tags.append("streaming")
+
+        add_tags = []
         starter = sd.ahead[add, w]
         if starter >= 0 and sd.out[starter, w]:
-            tags.append(f"role change behind {sd.name[starter]}")
+            add_tags.append(f"role opened up behind {sd.name[starter]}")
         elif starter >= 0 and sd.quest[starter, w]:
-            tags.append(f"handcuff, {sd.name[starter]} questionable")
+            add_tags.append(f"handcuff, {sd.name[starter]} questionable")
+        if sd.pos[add] in (K, DST):
+            add_tags.append("streaming")
         if sd.injured[add, w]:
-            tags.append("stash")
-        note = f"{kind} (+{gain:.1f})" + (" -- " + "; ".join(tags) if tags else "")
-        return note, note
+            add_tags.append("stash")
+
+        def fmt(tags):
+            return f"{kind} (+{gain:.1f})" + (" -- " + "; ".join(tags) if tags else "")
+
+        return fmt(drop_tags), fmt(add_tags)
 
     # -- waivers ----------------------------------------------------------
     def waiver_priority(self, week: int):

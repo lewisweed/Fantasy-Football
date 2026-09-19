@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from .config import (DST, K, N_POS, QB, RB, SLOT_ELIGIBLE, TE, WR)
+from .config import DST, K, N_POS, QB, RB, TE, WR
 
 # Bench weights: what the nth-best bench player at a position is worth, as a
 # fraction of his standalone value.  RB/WR depth starts high (byes, injuries and

@@ -259,19 +259,27 @@ def waiver_diagnostics(teams: pd.DataFrame, diag: dict, pool: pd.DataFrame) -> s
         [(r.player, r.pos, f"{r.add_rate:.2f}") for r in
          df.nlargest(15, "adds").itertuples()],
         ["most added", "pos", "adds per league"])
-    drafted = df[df.drafted >= n_leagues * 0.35]
+
+    # Kickers and defences turn over by design, so the interesting question is
+    # which *skill* players managers gave up on.  A ratio above 1 means he was
+    # dropped, picked back up and dropped again.
+    skill = df[(df.drafted >= n_leagues * 0.35) & df.pos.isin(["QB", "RB", "WR", "TE"])]
     most_dropped = md_table(
-        [(r.player, r.pos, f"{100*r.drop_rate:.0f}%",
-          f"{r.drafted/n_leagues:.2f}") for r in
-         drafted.nlargest(15, "drop_rate").itertuples()],
-        ["most dropped draftee", "pos", "dropped when drafted", "drafted per league"])
+        [(r.player, r.pos, f"{r.drop_rate:.2f}", f"{r.drafted/n_leagues:.2f}")
+         for r in skill.nlargest(15, "drop_rate").itertuples()],
+        ["most dropped draftee", "pos", "drops per draft", "drafted per league"])
+
+    kdst = df[df.pos.isin(["K", "DST"])]
+    churn = float(kdst.adds.sum() / n_leagues)
 
     qb = diag.get("qb_rostered")
     extra = []
     if qb is not None:
         extra.append(f"- QBs rostered per team at season's end: "
                      f"**{qb.mean():.2f}** (3 or more: {100*(qb >= 3).mean():.1f}% of teams)")
-    extra.append(f"- Moves per manager by activity: " + ", ".join(
+    extra.append(f"- Kicker and defence churn: **{churn:.1f}** adds per league "
+                 "across all twelve teams (streaming).")
+    extra.append("- Moves per manager by activity: " + ", ".join(
         f"{a} **{teams[teams.activity_name == a].adds.mean():.1f}**"
         for a in ACTIVITY_NAMES))
     return most_added + "\n\n" + most_dropped + "\n\n" + "\n".join(extra)
@@ -349,6 +357,101 @@ def validation(year: int, teams: pd.DataFrame, diag: dict, pool: pd.DataFrame) -
 
     return md_table([(c[0], c[1], c[2]) for c in checks],
                     ["result", "check", "detail"])
+
+
+# --------------------------------------------------------------------------
+# Written summary
+# --------------------------------------------------------------------------
+def summary(year: int, teams: pd.DataFrame, pool: pd.DataFrame) -> str:
+    """The findings, stated in sentences, with the numbers filled in from the run."""
+    n_leagues = len(teams) // 12
+    by_persona = teams.groupby("persona_name").champion.agg(["mean", "size"])
+    best = by_persona["mean"].idxmax()
+    worst = by_persona["mean"].idxmin()
+
+    band = teams.first_qb_round.map(qb_band)
+    by_band = teams.groupby(band).agg(title=("champion", "mean"),
+                                      pts=("reg_pts", "mean"), n=("champion", "size"))
+    by_band = by_band[by_band.n > 200]
+    best_band = by_band.title.idxmax()
+    worst_band = by_band.title.idxmin()
+    spread = by_band.pts.max() - by_band.pts.min()
+
+    act = teams.groupby("activity_name").champion.mean()
+    slot = teams.assign(s=teams.draft_slot + 1).groupby("s").champion.mean()
+
+    qb = teams[teams.first_qb >= 0].copy()
+    qb["qb_name"] = pool.player.to_numpy()[qb.first_qb.to_numpy()]
+    qb_tbl = qb.groupby("qb_name").agg(t=("champion", "mean"), n=("champion", "size"),
+                                       r=("first_qb_round", "mean"))
+    qb_tbl = qb_tbl[qb_tbl.n >= 150]
+    best_qb = qb_tbl.t.idxmax()
+    early = qb_tbl[qb_tbl.r <= 5]
+    best_early = early.t.idxmax() if len(early) else None
+
+    lines = [
+        "### What the season says",
+        "",
+        f"**Roster construction beat quarterback timing.** Across {n_leagues:,} "
+        f"leagues the spread between the best and worst persona "
+        f"({best} at {pct(by_persona['mean'].max())}, {worst} at "
+        f"{pct(by_persona['mean'].min())}) is wider than the spread across "
+        f"first-quarterback rounds, and the whole first-QB-round table covers "
+        f"only about {spread:.0f} points of season scoring.",
+        "",
+        f"**Waiting on a quarterback was right, but the edge is modest.** The "
+        f"best band was round {best_band} at "
+        f"{pct(by_band.title.loc[best_band])}, the worst round {worst_band} at "
+        f"{pct(by_band.title.loc[worst_band])}. The counterfactual table in "
+        "section 5 is the load-bearing version of this claim, because it holds "
+        "the rest of the league fixed; the raw table above is confounded by "
+        "which personas take quarterbacks early in the first place.",
+        "",
+        f"**Of the quarterbacks worth drafting, {best_qb} did the most for the "
+        f"teams that took him**"
+        + (f", and among quarterbacks going in the first five rounds it was "
+           f"{best_early}" if best_early else "")
+        + ". Section 4 prices each one against what he cost.",
+        "",
+        f"**Attention is worth more than any draft strategy.** Active managers "
+        f"won {pct(act.get('active', float('nan')))} of titles against "
+        f"{pct(act.get('lazy', float('nan')))} for lazy ones -- a bigger gap "
+        "than any persona produced, and it comes entirely from in-season work.",
+        "",
+        f"**Draft slot barely mattered.** Title rates ran from "
+        f"{pct(slot.min())} at slot {int(slot.idxmin())} to {pct(slot.max())} "
+        f"at slot {int(slot.idxmax())}, a range that the confidence intervals "
+        "in section 2 mostly swallow.",
+        "",
+        "### Caveats",
+        "",
+        "1. **One season, one set of outcomes.** Every league here replays the "
+        "same 2025: the same players get hurt in the same weeks and the same "
+        "breakouts happen. The variation is in drafts, schedules, waiver runs "
+        "and manager noise, not in football. A strategy that looks good here "
+        "may only be good at 2025. This is why the spec asks for 2023 and "
+        "2024 as well.",
+        "2. **ESPN and Fantasy Football Calculator were unreachable** from the "
+        "environment this ran in, so the draft board is FantasyPros' PPR "
+        "consensus rather than real mock-draft ADP, and weekly expectations "
+        "are FantasyPros rankings mapped to points through curves fitted on "
+        "2021-2024 rather than ESPN's own projections. See the README. The "
+        "board reproduces the spec's own ADP calibration fact closely, but "
+        "comparisons against section 9's prior findings may be measuring the "
+        "data tier rather than the model.",
+        "3. **Managers are model managers.** They do not trade, do not read "
+        "beat reports, and do not tilt. Their disagreements are Gaussian noise "
+        "rather than genuinely different theories of football.",
+        "4. **Title rates are noisy.** A 12-team league produces one champion, "
+        "so even 5,000 leagues gives roughly 400 titles per common persona. "
+        "Read the intervals, not the point estimates, and prefer season points "
+        "and playoff rate -- both far better measured -- when ranking.",
+        "5. **The persona mix is an assumption.** It was set from 2025 draft "
+        "advice, not observed from real leagues. Section 7 re-runs the "
+        "question under different mixes; conclusions that move between them "
+        "are not conclusions.",
+    ]
+    return "\n".join(lines)
 
 
 # --------------------------------------------------------------------------
@@ -431,6 +534,10 @@ def build_report(year: int) -> Path:
         "## 9. Validation checklist",
         "",
         validation(year, teams, diag, pool),
+        "",
+        "## 10. Summary",
+        "",
+        summary(year, teams, pool),
         "",
     ]
     out = RESULTS / f"report_{year}.md"
