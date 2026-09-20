@@ -1,0 +1,13 @@
+{
+  "year": 2022,
+  "n_players": 626,
+  "n_weeks": 17,
+  "tier": "nflverse+fantasypros",
+  "espn_file_present": false,
+  "ffc_file_present": true,
+  "calibration_years": [
+    2021,
+    2023,
+    2024
+  ]
+}
