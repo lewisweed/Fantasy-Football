@@ -525,3 +525,113 @@ How the first five rounds paid off, by position — points versus each player's 
 | Malik Nabers | WR | 7.5 | rostered | 15% | 8% | -191 | -13 |
 | Kaleb Johnson | RB | 79.2 | rostered | 18% | 8% | -123 | -12 |
 | Mike Evans | WR | 30.0 | rostered | 15% | 8% | -160 | -11 |
+
+---
+
+## 7. Effort does not merely beat strategy; it dominates every cell
+
+Title rate for each combination of draft strategy and manager effort, pooled
+over the five seasons:
+
+| strategy | lazy | moderate | active |
+|---|---|---|---|
+| elite_te | 6.00 | 7.76 | 10.09 |
+| late_qb | 5.91 | 8.15 | 10.26 |
+| qb_streamer | 5.17 | 8.62 | 10.51 |
+| robust_rb | 5.28 | 7.73 | 9.91 |
+| balanced | 4.94 | 7.63 | 9.97 |
+| elite_te_early_qb | 4.84 | 7.25 | 9.36 |
+| early_qb | 4.84 | 6.93 | 9.10 |
+| backup_qb_hoard | 4.78 | 6.86 | 9.79 |
+| elite_qb_only | 4.39 | 6.74 | 8.62 |
+| hero_rb | 4.12 | 7.28 | 8.65 |
+| zero_rb | 3.78 | 5.80 | 6.91 |
+
+Two comparisons matter:
+
+- Spread **across strategies**, holding effort at active: **3.60** points.
+- Spread **across effort levels**, averaged within a strategy: **4.47** points.
+
+Effort is the larger effect even measured this way, and unlike strategy it
+never changes sign. The three best strategy-by-effort cells in every one of the
+five seasons belong to active managers — fifteen out of fifteen — while the
+strategy occupying those cells changes completely, from Zero RB in 2018 to
+Robust RB in 2025.
+
+Zero RB gains least from activity (3.13 against a 4.47 average). A structural
+hole at a position with two starting slots and a flex is not something the
+waiver wire repairs.
+
+## 8. August cannot see the season. The first month can.
+
+Section 4 established that nothing observable before the draft predicts how a
+season will pay off. That is only half the question, because the draft is not
+the last decision a manager makes.
+
+Measuring the same RB-minus-WR payoff over different windows:
+
+| season | weeks 1–4 | weeks 1–6 | rest of season |
+|---|---|---|---|
+| 2018 | −3.03 | −2.65 | −1.98 |
+| 2019 | −1.56 | −0.45 | +0.60 |
+| 2023 | −2.36 | −2.64 | −1.88 |
+| 2024 | +3.15 | +1.73 | +3.77 |
+| 2025 | +1.57 | +1.03 | +1.59 |
+
+- Weeks 1–4 against the rest of the season: **r = +0.95**
+- Weeks 1–6 against the rest of the season: **r = +0.98**
+
+The obvious objection is that this is injury carry-over — a player who is out
+in week 2 is still out in week 10, so the same absences appear on both sides.
+So we recomputed the back half using **only players who were still healthy at
+week 6**, which removes that path entirely. The correlation is **+0.84**.
+
+So the signal is real and not merely mechanical, on five seasons. The quantity
+that decides which draft strategy wins is invisible in August and largely
+resolved by early October.
+
+That asymmetry is the strongest practical claim this project can make, and it
+points at a behaviour none of the eleven playbooks implements: **draft without a
+positional thesis, then let the first month tell you what kind of season it is
+and reallocate accordingly.** Section 9 tests it.
+
+## 10. Draft slot: a correction to the single-season report
+
+The 2025-only report concluded that draft slot produced a large effect that
+carried no information. Five seasons say half of that is right.
+
+Championship rate by slot, fair share 8.33%:
+
+| slot | 2018 | 2019 | 2023 | 2024 | 2025 | mean |
+|---|---|---|---|---|---|---|
+| 1 | 6.72 | 8.20 | 10.50 | 2.64 | 7.94 | 7.20 |
+| 2 | 6.72 | 9.44 | 8.02 | 3.10 | 9.20 | 7.30 |
+| 3 | 6.24 | 11.06 | 7.54 | 4.32 | 8.84 | 7.60 |
+| 4 | 7.02 | 10.92 | 7.08 | 6.02 | 6.14 | 7.44 |
+| 5 | 7.82 | 7.56 | 6.96 | 8.04 | 5.70 | 7.22 |
+| 6 | 8.88 | 4.94 | 5.42 | 9.10 | 5.38 | 6.74 |
+| 7 | 9.74 | 4.70 | 5.96 | 9.60 | 8.02 | 7.60 |
+| 8 | 9.92 | 5.52 | 6.32 | 11.04 | 8.58 | 8.28 |
+| 9 | 9.24 | 6.76 | 7.88 | 11.72 | 8.92 | 8.90 |
+| 10 | 8.86 | 8.78 | 9.24 | 10.90 | 10.60 | 9.68 |
+| 11 | 9.50 | 11.18 | 12.14 | 11.58 | 10.98 | 11.08 |
+| 12 | 9.34 | 10.94 | 12.94 | 11.94 | 9.70 | 10.97 |
+
+**Still right:** any one season's pattern is that season. Slot 1 won 2.64% of
+titles in 2024, when Christian McCaffrey was the first pick and missed nine
+games, and 10.50% in 2023.
+
+**Now wrong:** that slot carries no information at all. Slots 11 and 12 finish
+above fair share in all five seasons — ten results out of ten — and the middle
+of the snake is consistently the worst place to sit, slot 6 averaging 6.74%.
+The ends of a snake draft take their picks in pairs; the middle never does.
+
+We ruled out an assignment bug: personas and activity levels are distributed
+across all twelve slots to within 1.7 percentage points, consistent with
+sampling noise at 5,000 leagues per slot.
+
+**What we have not established is the mechanism.** The effect is clear in
+championships and inconsistent in scoring — the back of the draft outscores the
+front in three of five seasons and loses in two (+53, −18, −19, +52, +17). A
+mechanism that always moves titles but only sometimes moves points is not one we
+understand. Five seasons is enough to notice this and not enough to explain it.
