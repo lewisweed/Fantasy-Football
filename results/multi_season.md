@@ -595,6 +595,61 @@ points at a behaviour none of the eleven playbooks implements: **draft without a
 positional thesis, then let the first month tell you what kind of season it is
 and reallocate accordingly.** Section 9 tests it.
 
+## 9. Testing the behaviour: the in-season rebalancer
+
+Section 8 says the quantity that decides a season is invisible in August and
+largely resolved by early October. So we built a manager to exploit exactly
+that: **the rebalancer drafts with no positional thesis at all, then from week 4
+tilts what it shops for toward whichever position is actually delivering.** The
+signal it reads is `positional_form`, computed only from completed weeks — it
+returns zeros before week 4 and never looks forward.
+
+Tested the strongest way the simulator allows: identical league seeds, one team
+forced into the behaviour, compared against that same team's own default.
+
+| season | points/season | 95% CI | titles | playoffs |
+|---|---|---|---|---|
+| 2018 | **−6.2** | −8.9 to −3.5 | 8.34% → 7.96% | 50.1% → 48.7% |
+| 2019 | **+8.3** | +6.0 to +10.6 | 8.32% → 8.92% | 49.6% → 52.8% |
+| 2023 | +1.3 | −1.0 to +3.6 | 7.46% → 8.14% | 50.4% → 50.6% |
+| 2024 | **+9.2** | +6.8 to +11.6 | 8.80% → 8.80% | 49.2% → 51.8% |
+| 2025 | −1.9 | −4.3 to +0.6 | 7.86% → 8.00% | 50.1% → 49.7% |
+| **pooled** | **+2.1** | **+1.0 to +3.2** | | |
+
+**It works, and it barely matters.** The pooled gain is statistically solid
+across 25,000 paired leagues and comes to 2.1 points on a season of roughly
+1,560 — about 0.13%. Manager effort is worth 61 to 105 points over the same
+seasons. And it is negative in two of five, so it does not clear the bar the
+question set: a behaviour that outperforms every year, or nearly every year.
+
+**Why it captures so little.** The information arrives after the decision it
+would inform. The draft allocates sixteen picks in August and closes; the signal
+resolves in October; the only lever still available is the waiver wire, which
+offers marginal players. Checking the add counts confirms the lever is genuinely
+weak rather than mis-aimed — no player's add rate moves by even 6%. **A waiver
+wire cannot undo a draft.**
+
+We looked for a specific culprit in 2018, the worst season, and did not find one.
+The tempting story was that the signal correctly said "receivers" and so talked
+the manager out of James Conner, the season's biggest prize and a running back.
+The add counts do not support it: Conner's rate moves by 7 out of 257. The
+honest account is the general one above, not a narrative about one player.
+
+### What this rules out
+
+Two candidate behaviours were built and tested against the gap Section 8
+identifies. Both fail, in instructive ways:
+
+- **Reacting to the draft in front of you** (`adaptive_vona`) loses 9.2 points
+  a season in 2018 even after its confound is removed. Reacting to a positional
+  run means paying the run premium.
+- **Reacting to the season in front of you** (`rebalancer`) gains 2.1 points and
+  swings negative in two seasons of five.
+
+The behaviour that does outperform every year was already in the data before we
+went looking for a clever one: **be an active manager.** Fifteen orderings out of
+fifteen, worth twenty to fifty times what either of these behaviours produced.
+
 ## 10. Draft slot: a correction to the single-season report
 
 The 2025-only report concluded that draft slot produced a large effect that

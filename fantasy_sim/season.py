@@ -9,6 +9,7 @@ one -- and no persona ever makes someone play badly on purpose.
 """
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -21,7 +22,8 @@ from .draft import PERSONA_ID, PERSONA_NAMES, run_draft, sample_personas
 #: what it has seen, tilts its shopping by this much, and reads the signal off
 #: picks inside this ADP.
 REBALANCE_FROM_WEEK = 4
-REBALANCE_STRENGTH = 0.10
+#: Overridable so the tilt's strength can be swept without editing code.
+REBALANCE_STRENGTH = float(os.environ.get("FF_REBALANCE_STRENGTH", "0.10"))
 EARLY_PICK_ADP = 60.0
 
 ACTIVITY_NAMES = list(ACTIVITY_WEIGHTS)
