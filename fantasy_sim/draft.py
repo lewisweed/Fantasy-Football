@@ -20,9 +20,16 @@ from .config import (DRAFT_POS_CAP, DRAFT_POS_MIN, DST, K, KDST_EARLIEST_ROUND,
 PERSONA_NAMES = [
     "balanced", "late_qb", "robust_rb", "hero_rb", "early_qb", "elite_te",
     "zero_rb", "elite_qb_only", "backup_qb_hoard", "elite_te_early_qb",
-    "qb_streamer",
+    "qb_streamer", "adaptive_vona",
 ]
 PERSONA_ID = {n: i for i, n in enumerate(PERSONA_NAMES)}
+
+#: How many recent picks the run-aware drafter reads, and how strongly the
+#: league-average positional mix anchors that read before evidence arrives.
+RUN_WINDOW = 12
+RUN_PRIOR = 6.0
+#: Roughly the positional mix of a 16-round draft: QB RB WR TE K DST.
+_PICK_RATE_PRIOR = np.array([0.13, 0.32, 0.38, 0.11, 0.03, 0.03])
 
 #: Personas that deliberately skew their running-back timing.
 _RB_TIMING = {PERSONA_ID["zero_rb"], PERSONA_ID["hero_rb"]}
@@ -37,7 +44,7 @@ def persona_bias(pid: int, rnd: int, counts: np.ndarray, out: np.ndarray) -> Non
     out[:] = 0.0
     name = PERSONA_NAMES[pid]
 
-    if name == "balanced":
+    if name in ("balanced", "adaptive_vona"):
         return
 
     if name == "late_qb":
@@ -179,6 +186,30 @@ def cliff_and_lookahead(sd, avail: np.ndarray, pick_no: int, next_pick_no: int,
         look_out[p] = np.clip((best - nxt) / 4.0, 0.0, 1.5)
 
 
+def run_aware_lookahead(sd, avail: np.ndarray, pos_rate: np.ndarray, gap: int,
+                        out: np.ndarray) -> None:
+    """Lookahead that reads the room instead of the preseason ADP sheet.
+
+    ``cliff_and_lookahead`` asks "who does August say will still be here at my
+    next pick?".  That answer is fixed before the draft starts, so a manager
+    using it sits through a six-deep run on running backs without blinking.
+    This asks the same question of *this* draft: positions are coming off the
+    board at the rates in ``pos_rate``, so roughly ``pos_rate[p] * gap`` more
+    players go at position ``p`` before I am back on the clock.  The gap
+    between the best one left and the one that deep is what waiting costs.
+    """
+    out[:] = 0.0
+    vor = sd.draft_vor
+    for p in range(N_POS):
+        sel = np.where(avail & (sd.pos == p))[0]
+        if len(sel) < 2:
+            continue
+        order = sel[np.argsort(-vor[sel])]
+        taken = int(round(pos_rate[p] * gap))
+        nxt = vor[order[min(taken, len(order) - 1)]]
+        out[p] = np.clip((vor[order[0]] - nxt) / 4.0, 0.0, 1.5)
+
+
 def snake_order(n_teams: int, rounds: int) -> np.ndarray:
     """Draft-slot index for every overall pick."""
     base = np.arange(n_teams)
@@ -216,6 +247,7 @@ def run_draft(sd, rng: np.random.Generator, personas: np.ndarray,
     avail = np.ones(sd.n, dtype=bool)
     counts = np.zeros((n_teams, N_POS), dtype=np.int16)
     rosters = np.full((n_teams, rounds), -1, dtype=np.int32)
+    recent = np.zeros(n_picks, dtype=np.int64)   # position taken at each pick
     pick_of = np.full(sd.n, -1, dtype=np.int16)
 
     pbias = np.zeros(N_POS)
@@ -243,6 +275,16 @@ def run_draft(sd, rng: np.random.Generator, personas: np.ndarray,
             persona_bias(int(personas[m]), rnd, counts[m], pbias)
             universal_bias(int(personas[m]), rnd, counts[m], ubias)
             cliff_and_lookahead(sd, ok, pick + 1, next_pick_no, cliff, look)
+            if PERSONA_NAMES[personas[m]] == "adaptive_vona":
+                # Read the pace of the last round of picks rather than August's
+                # guess at who survives.  The prior keeps it sane at pick 1,
+                # and fades as real evidence accumulates.
+                seen = recent[max(0, pick - RUN_WINDOW):pick]
+                rate = _PICK_RATE_PRIOR * RUN_PRIOR
+                if len(seen):
+                    rate = rate + np.bincount(seen, minlength=N_POS)
+                rate = rate / rate.sum()
+                run_aware_lookahead(sd, ok, rate, next_pick_no - (pick + 1), look)
             strength = max(3.0, 0.18 * (pick + 1))
             tilt = (pbias + ubias + cliff + look) * strength
             score -= tilt[sd.pos]
@@ -258,6 +300,7 @@ def run_draft(sd, rng: np.random.Generator, personas: np.ndarray,
         choice = int(np.argmin(score))
         avail[choice] = False
         counts[m, sd.pos[choice]] += 1
+        recent[pick] = sd.pos[choice]
         rosters[m, rnd - 1] = choice
         pick_of[choice] = pick + 1
         if trace is not None:
