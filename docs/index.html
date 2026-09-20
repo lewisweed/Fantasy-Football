@@ -187,6 +187,7 @@
         <a href="#effort">What always worked</a>
         <a href="#qb">The QB question</a>
         <a href="#slot">Draft slot</a>
+        <a href="#cleverer">Something better?</a>
         <a href="#how">How it works</a>
       </nav>
     </div>
@@ -573,6 +574,53 @@
       <h3>The rule that makes it worth anything</h3>
       <p><strong>No manager ever sees the future.</strong> The hardest part of building this was not the simulation &mdash; it was stopping hindsight leaking in. Projection files, for example, quietly zero out a player&rsquo;s weekly projection for games he ended up missing, <em>including the week he got hurt mid-game</em>. Left alone, that hands every simulated manager a perfect injury forecast. Finding and repairing leaks like that is most of what the code does.</p>
       <p>A manager who is injured mid-week still starts. A breakout is only visible after it has happened. A player on a bye is on a bye.</p>
+    </div>
+  </div>
+</section>
+
+<section id="cleverer">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">The search for something better</p>
+      <h2>We went looking for a strategy nobody plays</h2>
+      <p>If no fixed playbook survives, maybe the answer is a manager who reacts. We built two and tested them the hard way &mdash; identical leagues, one team switched, compared against that same team&rsquo;s own behaviour.</p>
+    </div>
+    <div class="col">
+      <h3>One: react to the draft in front of you</h3>
+      <p>Every manager in the simulation judges who will still be available at their next pick using <em>preseason</em> rankings &mdash; a number fixed before the draft began. So nobody notices a run. We built one who does: it estimates who survives from the pace of picks actually happening, and moves when a position starts emptying.</p>
+      <p>Worth <strong>+2.7 points a season</strong>, positive in four seasons of five.</p>
+      <h3>Two: react to the season in front of you</h3>
+      <p>August cannot see what kind of season it is. <strong>The first month can.</strong> How much better early running backs are paying off than early receivers, measured over weeks&nbsp;1&ndash;6, predicts the rest of the season at <span class="num">+0.98</span> &mdash; and still <span class="num">+0.84</span> after dropping every player already injured by week&nbsp;6, so it is not just the same absences counted twice.</p>
+      <p>So we built a manager who drafts with no positional plan and then, from week&nbsp;4, shops toward whatever is actually working. Worth <strong>+2.1 points a season</strong>.</p>
+      <h3>Why neither one is the answer</h3>
+      <p>Both are real &mdash; a careful experiment detects them. Both are tiny. Here they are against the thing that was already in the data:</p>
+    </div>
+    <div class="wide">
+      <figure>
+        <div class="fh">
+          <h3>What each behaviour is actually worth</h3>
+          <p>Pooled across all five seasons and 25,000 paired leagues.</p>
+        </div>
+        <div class="tablewrap" style="border-top:none">
+          <table>
+            <thead><tr><th>Behaviour</th><th>Points/season</th><th>Title rate</th><th>Change</th></tr></thead>
+            <tbody>
+<tr><td><strong>React to the draft</strong></td><td>+2.7</td><td>8.16% &rarr; 8.63%</td><td>+0.47pp</td></tr>
+<tr><td><strong>React to the season</strong></td><td>+2.1</td><td>8.16% &rarr; 8.36%</td><td>+0.21pp</td></tr>
+<tr><td><strong>Just be an active manager</strong></td><td class="hi">+61 to +105</td><td class="hi">5.00% &rarr; 9.50%</td><td class="hi">+4.50pp</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figcaption>Both clever behaviours have title-rate intervals that still overlap the baseline. The active-manager gap does not, in any season.</figcaption>
+      </figure>
+    </div>
+    <div class="col">
+      <p>There is a reason the second one captures so little, and it is the most useful sentence on this page. <strong>The information arrives after the decision it would inform.</strong> Sixteen picks are allocated in August and then locked. The signal resolves in October. The only lever still available is a waiver wire offering marginal players.</p>
+      <p>We checked whether leaning harder helped. Tripling the in-season tilt made the good season slightly worse and the bad season catastrophic &mdash; from &minus;6 points to &minus;47. The downside scales; the upside does not. A strong positional tilt starts refusing genuinely good players for playing an unfashionable position.</p>
+      <div class="pull">
+        <p class="big">The edge from being cleverer at the draft is about a tenth of the edge from paying attention after it.</p>
+        <p class="sub">We spent considerably more effort finding the first one.</p>
+      </div>
     </div>
   </div>
 </section>
