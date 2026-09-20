@@ -15,7 +15,14 @@ import numpy as np
 
 from .config import ACTIVITY_PARAMS, ACTIVITY_WEIGHTS, N_POS, QB
 from . import values as V
-from .draft import PERSONA_ID, run_draft, sample_personas
+from .draft import PERSONA_ID, PERSONA_NAMES, run_draft, sample_personas
+
+#: The in-season rebalancer waits this many completed weeks before trusting
+#: what it has seen, tilts its shopping by this much, and reads the signal off
+#: picks inside this ADP.
+REBALANCE_FROM_WEEK = 4
+REBALANCE_STRENGTH = 0.10
+EARLY_PICK_ADP = 60.0
 
 ACTIVITY_NAMES = list(ACTIVITY_WEIGHTS)
 
@@ -106,6 +113,8 @@ class LeagueSim:
         self.add_count = np.zeros(sd.n, dtype=np.int32)
         self.drop_count = np.zeros(sd.n, dtype=np.int32)
         self.drafted_drop_count = np.zeros(sd.n, dtype=np.int32)
+        #: Positional form is the same for every team, so compute it once.
+        self._form_cache: dict[int, np.ndarray] = {}
 
     # -- setup ------------------------------------------------------------
     def setup(self):
@@ -158,6 +167,40 @@ class LeagueSim:
         self.weekly_points = np.zeros((cfg.n_teams, self.n_weeks))
 
     # -- valuation --------------------------------------------------------
+    def positional_form(self, week: int) -> np.ndarray:
+        """How each position has paid off so far, relative to its projection.
+
+        Nothing here looks past ``week - 1``.  A manager in week 8 can see
+        exactly this: the early picks at each position have, on average, beaten
+        or missed what they were projected to do, and by how much per game.
+
+        This is the one quantity the whole project says decides a season, and
+        the one thing no preseason board predicts.  It is knowable by about
+        week 4 -- which is the point of the manager who uses it.
+        """
+        if week in self._form_cache:
+            return self._form_cache[week]
+        sd = self.sd
+        out = np.zeros(N_POS)
+        past = max(week - 1, 0)
+        if past >= REBALANCE_FROM_WEEK:
+            early = sd.adp <= EARLY_PICK_ADP
+            played = sd.played[:, :past].sum(axis=1)
+            per = np.divide(sd.act[:, :past].sum(axis=1), np.maximum(played, 1))
+            exp = sd.prior
+            ok = early & (played >= past * 0.5)
+            for p in range(N_POS):
+                sel = ok & (sd.pos == p)
+                if sel.sum() >= 3:
+                    out[p] = float(np.mean(per[sel] - exp[sel]))
+            spread = out[:4].std()
+            if spread > 1e-9:
+                out = (out - out[:4].mean()) / spread
+            else:
+                out[:] = 0.0
+        self._form_cache[week] = out
+        return out
+
     def team_values(self, team: Team, week: int):
         alpha = V.prior_weight(week, team.alpha_trait)
         vals = V.player_values(self.sd, week, alpha, team.opinion)
@@ -169,6 +212,11 @@ class LeagueSim:
             if mine:
                 mask[mine] = False
             vals[mask] *= 0.55
+        if PERSONA_NAMES[team.persona] == "rebalancer":
+            # Let the season that is actually happening steer the shopping.
+            form = self.positional_form(week)
+            if np.any(form):
+                vals = vals * (1.0 + REBALANCE_STRENGTH * form)[self.sd.pos]
         avail = V.availability(self.sd, week)
         opt = V.option_value(self.sd, week, vals, avail)
         return vals * avail, opt * self.risk_appetite(team)

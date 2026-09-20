@@ -20,7 +20,7 @@ from .config import (DRAFT_POS_CAP, DRAFT_POS_MIN, DST, K, KDST_EARLIEST_ROUND,
 PERSONA_NAMES = [
     "balanced", "late_qb", "robust_rb", "hero_rb", "early_qb", "elite_te",
     "zero_rb", "elite_qb_only", "backup_qb_hoard", "elite_te_early_qb",
-    "qb_streamer", "adaptive_vona",
+    "qb_streamer", "adaptive_vona", "rebalancer",
 ]
 PERSONA_ID = {n: i for i, n in enumerate(PERSONA_NAMES)}
 
@@ -46,7 +46,7 @@ def persona_bias(pid: int, rnd: int, counts: np.ndarray, out: np.ndarray) -> Non
     out[:] = 0.0
     name = PERSONA_NAMES[pid]
 
-    if name in ("balanced", "adaptive_vona"):
+    if name in ("balanced", "adaptive_vona", "rebalancer"):
         return
 
     if name == "late_qb":
