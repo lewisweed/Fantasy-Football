@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Five Thousand Seasons</title>
-<meta name="description" content="Five real fantasy seasons, each simulated 5,000 times. The best draft strategy inverts from year to year, and nothing visible in August predicts which year you are in.">
+<meta name="description" content="Seven real fantasy seasons, each simulated 5,000 times. The best draft strategy inverts from year to year, and nothing visible in August predicts which year you are in.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231A6FA0'/%3E%3Crect x='5' y='14.5' width='22' height='3' rx='1.5' fill='%23ffffff' fill-opacity='0.55'/%3E%3Ccircle cx='19' cy='16' r='4.5' fill='%23ffffff'/%3E%3C/svg%3E">
 <meta property="og:type" content="article">
@@ -168,13 +168,13 @@
 <header class="hero">
   <div class="wrap">
     <div class="hero-stack">
-      <p class="eyebrow">A fantasy football experiment &middot; five seasons</p>
+      <p class="eyebrow">A fantasy football experiment &middot; seven seasons</p>
       <h1>Five Thousand Seasons</h1>
-      <p class="lede">We rebuilt five real fantasy seasons inside a computer and played each of them five thousand times, with twelve managers drafting, streaming and setting lineups in every one. We went looking for the best draft strategy. What we found instead is that the answer changes every year &mdash; and nothing you can see in August tells you which year you are about to play.</p>
+      <p class="lede">We rebuilt seven real fantasy seasons inside a computer and played each of them five thousand times, with twelve managers drafting, streaming and setting lineups in every one. We went looking for the best draft strategy. What we found instead is that the answer changes every year &mdash; and nothing you can see in August tells you which year you are about to play.</p>
       <dl class="keyfacts">
-        <div><dt>Seasons</dt><dd>5</dd></div>
-        <div><dt>Leagues played</dt><dd>25,000</dd></div>
-        <div><dt>Team-seasons</dt><dd>300,000</dd></div>
+        <div><dt>Seasons</dt><dd>7</dd></div>
+        <div><dt>Leagues played</dt><dd>35,000</dd></div>
+        <div><dt>Team-seasons</dt><dd>420,000</dd></div>
         <div><dt>Format</dt><dd>12-tm PPR</dd></div>
       </dl>
       <nav class="toc">
@@ -270,7 +270,7 @@
     <div class="sec-head">
       <p class="eyebrow">The finding</p>
       <h2>The best strategy changes every year &mdash; violently</h2>
-      <p>This is the chart the project was built to produce, and it is not the chart we expected. Each line is one strategy, tracked across five seasons. If any strategy were reliably good, its line would stay high.</p>
+      <p>This is the chart the project was built to produce, and it is not the chart we expected. Each line is one strategy, tracked across seven seasons. If any strategy were reliably good, its line would stay high.</p>
     </div>
     <div class="wide">
       <figure>
@@ -284,34 +284,35 @@
           <span><span class="swatch" style="background:var(--accent)"></span>Robust RB</span>
           <span><span class="swatch" style="background:var(--muted)"></span>the other nine</span>
         </div>
-        <figcaption>Hover any line to isolate it. 2020 is excluded (no preseason, opt-outs, COVID-list absences); 2021 and 2022 are not yet simulated.</figcaption>
+        <figcaption>Hover any line to isolate it. 2020 is excluded (no preseason, opt-outs, COVID-list absences) and 2012 (the draft-data source went only eight rounds deep). 2021 and 2022 are built without ESPN projections; that source difference was tested directly and does not move the ranking.</figcaption>
       </figure>
     </div>
     <div class="col">
-      <p><strong>Zero&nbsp;RB is the best strategy in the dataset and the worst strategy in the dataset.</strong> In 2018 it finished +1.79, first of eleven. In 2019 it finished &minus;3.06, last by a mile. Robust&nbsp;RB does the same thing in reverse: worst in 2023, best in 2024.</p>
+      <p><strong>Zero&nbsp;RB is the best strategy in the dataset and the worst strategy in the dataset.</strong> In 2018 it finished +1.79, first of eleven. In 2019 it finished &minus;3.06, last by a mile. Robust&nbsp;RB does the same thing in reverse: worst in 2023, best in 2025.</p>
+      <p>The sharpest case arrived with the two seasons added last, and it is <em>consecutive</em>. <strong>QB&nbsp;streamer is the best strategy of 2021 and the worst of 2022.</strong> Elite&nbsp;TE&nbsp;+&nbsp;early&nbsp;QB does the exact reverse over the same two years. A manager who drew the obvious lesson from 2021 &mdash; don&rsquo;t pay for a quarterback &mdash; was running the worst board in the league twelve months later.</p>
       <p>These are not small samples wobbling. Within any single season each of these gaps is measured across tens of thousands of teams and is extremely precise. The lines really do cross.</p>
     </div>
     <div class="wide">
       <figure>
         <div class="fh">
-          <h3>Five-season averages, with confidence intervals</h3>
-          <p>Standing averaged over the five seasons. The interval is the range the true long-run value plausibly occupies.</p>
+          <h3>Seven-season averages, with confidence intervals</h3>
+          <p>Standing averaged over the seven seasons. The interval is the range the true long-run value plausibly occupies.</p>
         </div>
         <div class="tablewrap" style="border-top:none">
           <table>
-            <thead><tr><th>Strategy</th><th>2018</th><th>2019</th><th>2023</th><th>2024</th><th>2025</th><th>Average</th><th>95% interval</th><th>Verdict</th></tr></thead>
+            <thead><tr><th>Strategy</th><th>2018</th><th>2019</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th><th>Average</th><th>95% interval</th><th>Verdict</th></tr></thead>
             <tbody>
-<tr><td><strong>Elite TE</strong></td><td>+0.14</td><td>+0.44</td><td>+0.57</td><td class="lo">&minus;0.33</td><td class="hi">+0.95</td><td>+0.35</td><td>&minus;0.24 to +0.95</td><td>can&rsquo;t tell</td></tr>
-<tr><td><strong>Late QB</strong></td><td>+0.01</td><td>+0.78</td><td class="lo">&minus;0.29</td><td>+0.29</td><td>+0.42</td><td>+0.24</td><td>&minus;0.26 to +0.75</td><td>can&rsquo;t tell</td></tr>
-<tr><td><strong>Balanced</strong></td><td class="lo">&minus;0.12</td><td>+0.41</td><td>+0.10</td><td>+0.55</td><td>+0.25</td><td>+0.24</td><td>&minus;0.09 to +0.56</td><td>can&rsquo;t tell</td></tr>
-<tr><td><strong>Backup-QB hoarder</strong></td><td class="lo">&minus;0.20</td><td>+0.60</td><td class="lo">&minus;0.14</td><td>+0.52</td><td>+0.09</td><td>+0.17</td><td>&minus;0.28 to +0.63</td><td>can&rsquo;t tell</td></tr>
-<tr><td><strong>Elite QB only</strong></td><td class="lo">&minus;0.84</td><td>+0.22</td><td class="hi">+1.31</td><td>+0.80</td><td class="lo">&minus;0.69</td><td>+0.16</td><td>&minus;0.99 to +1.32</td><td>can&rsquo;t tell</td></tr>
-<tr><td><strong>Hero RB</strong></td><td class="hi">+1.87</td><td class="lo">&minus;0.14</td><td class="lo">&minus;0.10</td><td class="lo">&minus;1.44</td><td>+0.48</td><td>+0.13</td><td>&minus;1.35 to +1.62</td><td>can&rsquo;t tell</td></tr>
-<tr><td><strong>Early QB</strong></td><td class="lo">&minus;0.67</td><td>+0.08</td><td class="hi">+1.09</td><td>+0.67</td><td class="lo">&minus;0.56</td><td>+0.12</td><td>&minus;0.83 to +1.07</td><td>can&rsquo;t tell</td></tr>
-<tr><td><strong>QB streamer</strong></td><td>+0.23</td><td>+0.32</td><td class="lo">&minus;1.27</td><td>+0.15</td><td>+0.35</td><td>&minus;0.04</td><td>&minus;0.90 to +0.81</td><td>can&rsquo;t tell</td></tr>
-<tr><td><strong>Robust RB</strong></td><td class="lo">&minus;1.66</td><td>+0.38</td><td class="lo">&minus;2.26</td><td class="hi">+1.49</td><td class="hi">+1.60</td><td>&minus;0.09</td><td>&minus;2.31 to +2.12</td><td>can&rsquo;t tell</td></tr>
-<tr><td><strong>Elite TE + early QB</strong></td><td class="lo">&minus;0.54</td><td class="lo">&minus;0.03</td><td class="hi">+0.96</td><td class="lo">&minus;0.59</td><td class="lo">&minus;0.45</td><td>&minus;0.13</td><td>&minus;0.94 to +0.68</td><td>can&rsquo;t tell</td></tr>
-<tr><td><strong>Zero RB</strong></td><td class="hi">+1.79</td><td class="lo">&minus;3.06</td><td>+0.03</td><td class="lo">&minus;2.12</td><td class="lo">&minus;2.44</td><td>&minus;1.16</td><td>&minus;3.66 to +1.34</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Elite QB only</strong></td><td class="lo">&minus;0.84</td><td>+0.22</td><td>+0.81</td><td>+0.38</td><td class="hi">+1.31</td><td>+0.80</td><td>&minus;0.69</td><td>+0.29</td><td>&minus;0.45 to +1.02</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Elite TE</strong></td><td>+0.14</td><td>+0.44</td><td>&minus;0.23</td><td>+0.08</td><td>+0.57</td><td class="lo">&minus;0.33</td><td class="hi">+0.95</td><td>+0.23</td><td>&minus;0.19 to +0.65</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Late QB</strong></td><td>+0.01</td><td>+0.78</td><td class="hi">+1.06</td><td class="lo">&minus;0.73</td><td>&minus;0.29</td><td>+0.29</td><td>+0.42</td><td>+0.22</td><td>&minus;0.35 to +0.79</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>QB hoarder</strong></td><td class="lo">&minus;0.20</td><td class="hi">+0.60</td><td>&minus;0.08</td><td>+0.38</td><td>&minus;0.14</td><td>+0.52</td><td>+0.09</td><td>+0.17</td><td>&minus;0.14 to +0.47</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Balanced</strong></td><td>&minus;0.12</td><td>+0.41</td><td>+0.11</td><td class="lo">&minus;0.24</td><td>+0.10</td><td class="hi">+0.55</td><td>+0.25</td><td>+0.15</td><td>&minus;0.11 to +0.41</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Early QB</strong></td><td class="lo">&minus;0.67</td><td>+0.08</td><td>&minus;0.64</td><td>+0.99</td><td class="hi">+1.09</td><td>+0.67</td><td>&minus;0.56</td><td>+0.14</td><td>&minus;0.58 to +0.86</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Hero RB</strong></td><td class="hi">+1.87</td><td>&minus;0.14</td><td>&minus;0.14</td><td>&minus;0.10</td><td>&minus;0.10</td><td class="lo">&minus;1.44</td><td>+0.48</td><td>+0.06</td><td>&minus;0.85 to +0.97</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>QB streamer</strong></td><td>+0.23</td><td>+0.32</td><td class="hi">+2.10</td><td class="lo">&minus;1.85</td><td>&minus;1.27</td><td>+0.15</td><td>+0.35</td><td>+0.00</td><td>&minus;1.18 to +1.18</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Elite TE + early QB</strong></td><td>&minus;0.54</td><td>&minus;0.03</td><td class="lo">&minus;1.63</td><td class="hi">+1.50</td><td>+0.96</td><td>&minus;0.59</td><td>&minus;0.45</td><td>&minus;0.11</td><td>&minus;1.08 to +0.86</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Robust RB</strong></td><td>&minus;1.66</td><td>+0.38</td><td>&minus;0.08</td><td>&minus;1.50</td><td class="lo">&minus;2.26</td><td>+1.49</td><td class="hi">+1.60</td><td>&minus;0.29</td><td>&minus;1.73 to +1.14</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Zero RB</strong></td><td class="hi">+1.79</td><td class="lo">&minus;3.06</td><td>&minus;1.28</td><td>+1.08</td><td>+0.03</td><td>&minus;2.12</td><td>&minus;2.44</td><td>&minus;0.86</td><td>&minus;2.57 to +0.86</td><td>can&rsquo;t tell</td></tr>
             </tbody>
           </table>
         </div>
@@ -320,13 +321,13 @@
     </div>
     <div class="col">
       <div class="pull">
-        <p class="big">Not one of the eleven strategies has a five-season average distinguishable from the field.</p>
-        <p class="sub">Including Zero&nbsp;RB, which is worst overall by a distance &mdash; and whose interval still reaches +1.34, because in 2018 it was the best strategy on the board.</p>
+        <p class="big">Not one of the eleven strategies has a seven-season average distinguishable from the field.</p>
+        <p class="sub">Including Zero&nbsp;RB, which is worst overall by a distance &mdash; and whose interval still reaches +0.86, because in 2018 it was the best strategy on the board.</p>
       </div>
       <h3>Is the ranking just noise?</h3>
       <p>No, and this is the part that makes the finding sharp. We measured the same thing two ways.</p>
-      <p><strong>Do seasons agree with each other?</strong> Rank agreement between any two seasons averages <span class="num">&minus;0.11</span>, and between 2018 and 2024 it is <span class="num">&minus;0.84</span> &mdash; nearly a perfect reversal. Shuffling eleven strategies at random gives 0.00&nbsp;&plusmn;&nbsp;0.32, so &minus;0.11 is indistinguishable from no relationship at all.</p>
-      <p><strong>Does a season agree with itself?</strong> Split one season&rsquo;s leagues into two halves and rank the strategies separately in each. Agreement is <span class="num">+0.93</span>.</p>
+      <p><strong>Do seasons agree with each other?</strong> Rank agreement across all 21 pairs of seasons averages <span class="num">&minus;0.09</span>, and between 2018 and 2024 it is <span class="num">&minus;0.84</span> &mdash; nearly a perfect reversal. Shuffling eleven strategies at random gives 0.00&nbsp;&plusmn;&nbsp;0.32, so this is indistinguishable from no relationship at all.</p>
+      <p><strong>Does a season agree with itself?</strong> Split one season&rsquo;s leagues into two halves and rank the strategies separately in each. Agreement averages <span class="num">+0.92</span>.</p>
       <p>So the measurement is nearly perfect, and it still does not travel. A season&rsquo;s ranking is real, precise, and <em>about that season</em>. That is the cleanest way this question can be settled with the data available.</p>
     </div>
   </div>
@@ -349,23 +350,25 @@
           <table>
             <thead><tr><th>Season</th><th>QB</th><th>RB</th><th>WR</th><th>TE</th><th>RB minus WR</th><th>Best strategy</th><th>Worst</th></tr></thead>
             <tbody>
-<tr><td><strong>2018</strong></td><td>&minus;18</td><td class="lo">&minus;38</td><td>&minus;9</td><td>&minus;15</td><td class="lo">&minus;30</td><td>Hero RB</td><td>Robust RB</td></tr>
-<tr><td><strong>2019</strong></td><td>&minus;28</td><td>&minus;31</td><td>&minus;32</td><td class="lo">&minus;45</td><td>+1</td><td>Late QB</td><td>Zero RB</td></tr>
-<tr><td><strong>2023</strong></td><td>&minus;46</td><td class="lo">&minus;61</td><td>&minus;30</td><td>&minus;18</td><td class="lo">&minus;31</td><td>Elite QB only</td><td>Robust RB</td></tr>
-<tr><td><strong>2024</strong></td><td>+2</td><td class="hi">0</td><td>&minus;40</td><td>&minus;26</td><td class="hi">+41</td><td>Robust RB</td><td>Zero RB</td></tr>
-<tr><td><strong>2025</strong></td><td class="lo">&minus;88</td><td>&minus;41</td><td>&minus;60</td><td>&minus;41</td><td class="hi">+19</td><td>Robust RB</td><td>Zero RB</td></tr>
+<tr><td><strong>2018</strong></td><td>&minus;18</td><td>&minus;38</td><td>&minus;9</td><td>&minus;15</td><td class="lo">&minus;30</td><td>Hero RB</td><td>Robust RB</td></tr>
+<tr><td><strong>2019</strong></td><td>&minus;28</td><td>&minus;31</td><td>&minus;32</td><td>&minus;45</td><td>+1</td><td>Late QB</td><td>Zero RB</td></tr>
+<tr><td><strong>2021</strong></td><td>&minus;27</td><td>&minus;34</td><td>&minus;32</td><td>&minus;2</td><td>&minus;1</td><td>QB streamer</td><td>Elite TE + early QB</td></tr>
+<tr><td><strong>2022</strong></td><td>&minus;10</td><td>&minus;46</td><td>&minus;35</td><td>&minus;47</td><td>&minus;11</td><td>Elite TE + early QB</td><td>QB streamer</td></tr>
+<tr><td><strong>2023</strong></td><td>&minus;46</td><td>&minus;61</td><td>&minus;30</td><td>&minus;18</td><td class="lo">&minus;31</td><td>Elite QB only</td><td>Robust RB</td></tr>
+<tr><td><strong>2024</strong></td><td>+2</td><td>+0</td><td>&minus;40</td><td>&minus;26</td><td class="hi">+41</td><td>Robust RB</td><td>Zero RB</td></tr>
+<tr><td><strong>2025</strong></td><td>&minus;88</td><td>&minus;41</td><td>&minus;60</td><td>&minus;41</td><td class="hi">+19</td><td>Robust RB</td><td>Zero RB</td></tr>
             </tbody>
           </table>
         </div>
-        <figcaption>2025 is the most quarterback-hostile season in the set by roughly double. 2024 is the only season in which early running backs simply met expectations.</figcaption>
+        <figcaption>2025 is the most quarterback-hostile season in the set by roughly double. 2024 is the only season in which early running backs simply met expectations. 2022 was the worst season for running backs of any measured.</figcaption>
       </figure>
     </div>
     <div class="col">
       <p>That last column explains almost everything. Correlate it with how each strategy did:</p>
       <ul class="plain">
-        <li><strong>Robust RB: <span class="num">+0.95</span>.</strong> Its season is decided by that one number almost entirely.</li>
-        <li><strong>Zero RB: <span class="num">&minus;0.76</span>.</strong> The same bet, taken from the other side.</li>
-        <li><strong>Balanced: <span class="num">+0.87</span>.</strong> Worth naming honestly &mdash; a manager who just follows consensus inherits a running-back-heavy early board in this era, and carries much of the same exposure without ever choosing it.</li>
+        <li><strong>Robust RB: <span class="num">+0.93</span>.</strong> Its season is decided by that one number almost entirely.</li>
+        <li><strong>Zero RB: <span class="num">&minus;0.74</span>.</strong> The same bet, taken from the other side.</li>
+        <li><strong>Balanced: <span class="num">+0.76</span>.</strong> Worth naming honestly &mdash; a manager who just follows consensus inherits a running-back-heavy early board in this era, and carries much of the same exposure without ever choosing it.</li>
       </ul>
       <div class="pull">
         <p class="big">Robust RB and Zero RB are not really strategies. They are leveraged bets on one number.</p>
@@ -442,7 +445,7 @@
     <div class="sec-head">
       <p class="eyebrow">The one thing that held</p>
       <h2>Paying attention worked every single year</h2>
-      <p>Set this chart next to the first one. The strategy lines cross constantly. These three never touch.</p>
+      <p>Set this chart next to the first one. The strategy lines cross constantly. These three never touch, in any of the seven seasons.</p>
     </div>
     <div class="wide">
       <figure>
@@ -456,12 +459,12 @@
           <span><span class="swatch" style="background:var(--muted)"></span>Moderate</span>
           <span><span class="swatch" style="background:var(--warm)"></span>Lazy</span>
         </div>
-        <figcaption>Fair share in a 12-team league is 8.33%. The active&ndash;lazy gap ranges from 3.7 to 5.4 percentage points, and the ordering holds in all five seasons.</figcaption>
+        <figcaption>Fair share in a 12-team league is 8.33%. The active&ndash;lazy gap ranges from 3.2 to 5.4 percentage points, and the ordering holds in all seven seasons.</figcaption>
       </figure>
     </div>
     <div class="col">
-      <p>Active beats moderate beats lazy in <strong>all five seasons, on both title rate and total scoring &mdash; fifteen orderings out of fifteen.</strong> The scoring gap runs from 61 to 105 points a season.</p>
-      <p>Now compare that to the table further up, where not one draft strategy separated from the field over the same five years.</p>
+      <p>Active beats moderate beats lazy in <strong>all seven seasons, on both title rate and total scoring &mdash; twenty-one orderings out of twenty-one.</strong> The scoring gap runs from 61 to 105 points a season.</p>
+      <p>Now compare that to the table further up, where not one draft strategy separated from the field over the same seven years. With more seasons the gap between the best and worst <em>strategy</em> actually shrank, while this one held.</p>
       <div class="pull">
         <p class="big">How you draft is a bet on the season. Whether you manage the roster afterwards is not.</p>
         <p class="sub">This is the least glamorous finding in the project and comfortably the most useful. The draft is one afternoon everybody agonises over; the waiver wire is fourteen small decisions most people skip.</p>
@@ -511,8 +514,8 @@
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">A correction</p>
-      <h2>Draft slot: the one place five seasons changed our answer</h2>
-      <p>The single-season version of this page said draft slot produced a big effect that meant nothing. With five seasons, half of that is still right and half of it is not.</p>
+      <h2>Draft slot: the one place more seasons changed our answer</h2>
+      <p>The single-season version of this page said draft slot produced a big effect that meant nothing. With seven seasons, half of that is still right and half of it is not.</p>
     </div>
     <div class="wide">
       <figure>
@@ -522,31 +525,31 @@
         </div>
         <div class="tablewrap" style="border-top:none">
           <table>
-            <thead><tr><th>Slot</th><th>2018</th><th>2019</th><th>2023</th><th>2024</th><th>2025</th><th>Average</th></tr></thead>
+            <thead><tr><th>Slot</th><th>2018</th><th>2019</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th><th>Average</th></tr></thead>
             <tbody>
-<tr><td><strong>1</strong></td><td class="lo">6.72</td><td class="lo">8.20</td><td class="hi">10.50</td><td class="lo">2.64</td><td class="lo">7.94</td><td class="lo">7.20</td></tr>
-<tr><td><strong>2</strong></td><td class="lo">6.72</td><td class="hi">9.44</td><td class="lo">8.02</td><td class="lo">3.10</td><td class="hi">9.20</td><td class="lo">7.30</td></tr>
-<tr><td><strong>3</strong></td><td class="lo">6.24</td><td class="hi">11.06</td><td class="lo">7.54</td><td class="lo">4.32</td><td class="hi">8.84</td><td class="lo">7.60</td></tr>
-<tr><td><strong>4</strong></td><td class="lo">7.02</td><td class="hi">10.92</td><td class="lo">7.08</td><td class="lo">6.02</td><td class="lo">6.14</td><td class="lo">7.44</td></tr>
-<tr><td><strong>5</strong></td><td class="lo">7.82</td><td class="lo">7.56</td><td class="lo">6.96</td><td class="lo">8.04</td><td class="lo">5.70</td><td class="lo">7.22</td></tr>
-<tr><td><strong>6</strong></td><td class="hi">8.88</td><td class="lo">4.94</td><td class="lo">5.42</td><td class="hi">9.10</td><td class="lo">5.38</td><td class="lo">6.74</td></tr>
-<tr><td><strong>7</strong></td><td class="hi">9.74</td><td class="lo">4.70</td><td class="lo">5.96</td><td class="hi">9.60</td><td class="lo">8.02</td><td class="lo">7.60</td></tr>
-<tr><td><strong>8</strong></td><td class="hi">9.92</td><td class="lo">5.52</td><td class="lo">6.32</td><td class="hi">11.04</td><td class="hi">8.58</td><td class="lo">8.28</td></tr>
-<tr><td><strong>9</strong></td><td class="hi">9.24</td><td class="lo">6.76</td><td class="lo">7.88</td><td class="hi">11.72</td><td class="hi">8.92</td><td class="hi">8.90</td></tr>
-<tr><td><strong>10</strong></td><td class="hi">8.86</td><td class="hi">8.78</td><td class="hi">9.24</td><td class="hi">10.90</td><td class="hi">10.60</td><td class="hi">9.68</td></tr>
-<tr><td><strong>11</strong></td><td class="hi">9.50</td><td class="hi">11.18</td><td class="hi">12.14</td><td class="hi">11.58</td><td class="hi">10.98</td><td class="hi">11.08</td></tr>
-<tr><td><strong>12</strong></td><td class="hi">9.34</td><td class="hi">10.94</td><td class="hi">12.94</td><td class="hi">11.94</td><td class="hi">9.70</td><td class="hi">10.97</td></tr>
+<tr><td><strong>1</strong></td><td class="lo">6.72</td><td class="lo">8.20</td><td class="lo">7.56</td><td class="hi">8.34</td><td class="hi">10.50</td><td class="lo">2.64</td><td class="lo">7.94</td><td class="lo">7.41</td></tr>
+<tr><td><strong>2</strong></td><td class="lo">6.72</td><td class="hi">9.44</td><td class="lo">7.74</td><td class="hi">8.96</td><td class="lo">8.02</td><td class="lo">3.10</td><td class="hi">9.20</td><td class="lo">7.60</td></tr>
+<tr><td><strong>3</strong></td><td class="lo">6.24</td><td class="hi">11.06</td><td class="lo">7.20</td><td class="lo">8.22</td><td class="lo">7.54</td><td class="lo">4.32</td><td class="hi">8.84</td><td class="lo">7.63</td></tr>
+<tr><td><strong>4</strong></td><td class="lo">7.02</td><td class="hi">10.92</td><td class="lo">6.92</td><td class="lo">8.22</td><td class="lo">7.08</td><td class="lo">6.02</td><td class="lo">6.14</td><td class="lo">7.47</td></tr>
+<tr><td><strong>5</strong></td><td class="lo">7.82</td><td class="lo">7.56</td><td class="lo">7.38</td><td class="lo">8.14</td><td class="lo">6.96</td><td class="lo">8.04</td><td class="lo">5.70</td><td class="lo">7.37</td></tr>
+<tr><td><strong>6</strong></td><td class="hi">8.88</td><td class="lo">4.94</td><td class="lo">7.60</td><td class="lo">7.54</td><td class="lo">5.42</td><td class="hi">9.10</td><td class="lo">5.38</td><td class="lo">6.98</td></tr>
+<tr><td><strong>7</strong></td><td class="hi">9.74</td><td class="lo">4.70</td><td class="lo">7.76</td><td class="hi">8.54</td><td class="lo">5.96</td><td class="hi">9.60</td><td class="lo">8.02</td><td class="lo">7.76</td></tr>
+<tr><td><strong>8</strong></td><td class="hi">9.92</td><td class="lo">5.52</td><td class="lo">8.02</td><td class="lo">7.84</td><td class="lo">6.32</td><td class="hi">11.04</td><td class="hi">8.58</td><td class="lo">8.18</td></tr>
+<tr><td><strong>9</strong></td><td class="hi">9.24</td><td class="lo">6.76</td><td class="hi">8.96</td><td class="lo">8.26</td><td class="lo">7.88</td><td class="hi">11.72</td><td class="hi">8.92</td><td class="hi">8.82</td></tr>
+<tr><td><strong>10</strong></td><td class="hi">8.86</td><td class="hi">8.78</td><td class="hi">9.16</td><td class="hi">9.26</td><td class="hi">9.24</td><td class="hi">10.90</td><td class="hi">10.60</td><td class="hi">9.54</td></tr>
+<tr><td><strong>11</strong></td><td class="hi">9.50</td><td class="hi">11.18</td><td class="hi">10.34</td><td class="hi">8.48</td><td class="hi">12.14</td><td class="hi">11.58</td><td class="hi">10.98</td><td class="hi">10.60</td></tr>
+<tr><td><strong>12</strong></td><td class="hi">9.34</td><td class="hi">10.94</td><td class="hi">11.36</td><td class="lo">8.20</td><td class="hi">12.94</td><td class="hi">11.94</td><td class="hi">9.70</td><td class="hi">10.63</td></tr>
             </tbody>
           </table>
         </div>
-        <figcaption>Slots 11 and 12 finish above fair share in all five seasons &mdash; ten results out of ten. Slot 1 ranges from 2.64% to 10.50%.</figcaption>
+        <figcaption>Slots 11 and 12 finish above fair share in thirteen of fourteen season-slots &mdash; 2022&rsquo;s slot 12, at 8.20%, is the only miss. Slot 1 ranges from 2.64% to 10.50%.</figcaption>
       </figure>
     </div>
     <div class="col">
       <p><strong>Still right:</strong> any individual season&rsquo;s slot pattern is mostly that season. 2024 punished the front of the draft brutally (slot 1 won 2.6% of titles) because Christian McCaffrey was the first pick and missed nine games. In 2023 slot 1 was among the best. You cannot read one year&rsquo;s slot table and learn anything.</p>
-      <p><strong>Now wrong:</strong> the claim that slot tells you nothing at all. Averaged over five seasons the back of the snake beats the front by about three and a half percentage points of title rate, and <em>the middle is consistently the worst place to sit</em> &mdash; slot 6 averages 6.74%. The ends of a snake draft get their picks in pairs; the middle never does.</p>
+      <p><strong>Now wrong:</strong> the claim that slot tells you nothing at all. Averaged over seven seasons the back four slots win 10.26% of titles against the front four&rsquo;s 7.52%, and <em>the middle is consistently the worst place to sit</em> &mdash; slot 6 averages 6.98%. The ends of a snake draft get their picks in pairs; the middle never does.</p>
       <p>We checked that this is not a bug in how teams are assigned: personas and manager types are distributed evenly across all twelve slots to within sampling noise.</p>
-      <p><strong>What we have not established is why.</strong> The effect is clear in championships but does not track scoring consistently &mdash; the back of the draft outscores the front in three of five seasons and loses in two. A mechanism that only sometimes moves points but always moves titles is not a mechanism we understand yet. Five seasons is enough to notice this; it is not enough to explain it, and we are not going to pretend otherwise.</p>
+      <p><strong>What we still have not established is why.</strong> The scoring evidence firmed up with two more seasons &mdash; the back of the draft now outscores the front in five of seven, where at five seasons it was three of five &mdash; but it is still not unanimous. A mechanism that always moves titles and only usually moves points is not one we can claim to understand. Seven seasons is enough to be confident the effect is real; it is not enough to explain it, and we are not going to pretend otherwise.</p>
       <div class="pull">
         <p class="big">If your league lets you pick a slot, the back of the snake is the better bet. Everything else about slot is noise.</p>
         <p class="sub">And you almost certainly cannot pick.</p>
@@ -559,7 +562,7 @@
     <div class="sec-head">
       <p class="eyebrow">Under the hood</p>
       <h2>How the simulation works</h2>
-      <p>Each of the five seasons is replayed five thousand times. Players score exactly what they really scored, week by week. Everything else &mdash; who drafted them, who started them, who picked them up &mdash; is simulated.</p>
+      <p>Each of the seven seasons is replayed five thousand times. Players score exactly what they really scored, week by week. Everything else &mdash; who drafted them, who started them, who picked them up &mdash; is simulated.</p>
     </div>
     <div class="wide">
       <ol class="steps">
@@ -590,16 +593,17 @@
       <p>Every manager in the simulation judges who will still be available at their next pick using <em>preseason</em> rankings &mdash; a number fixed before the draft began. So nobody notices a run. We built one who does: it estimates who survives from the pace of picks actually happening, and moves when a position starts emptying.</p>
       <p>Worth <strong>+2.7 points a season</strong>, positive in four seasons of five.</p>
       <h3>Two: react to the season in front of you</h3>
-      <p>August cannot see what kind of season it is. <strong>The first month can.</strong> How much better early running backs are paying off than early receivers, measured over weeks&nbsp;1&ndash;6, predicts the rest of the season at <span class="num">+0.98</span> &mdash; and still <span class="num">+0.84</span> after dropping every player already injured by week&nbsp;6, so it is not just the same absences counted twice.</p>
+      <p>August cannot see what kind of season it is. <strong>The first month largely can.</strong> How much better early running backs are paying off than early receivers, measured over weeks&nbsp;1&ndash;6, predicts the rest of the season at <span class="num">+0.83</span> across the seven seasons.</p>
+      <p class="num" style="font-size:.86rem;color:var(--muted)">An earlier version of this page put that figure at +0.98 and added that it held at +0.84 among players still healthy at week&nbsp;6, &ldquo;so it is not just the same absences counted twice.&rdquo; Two more seasons pulled the headline number down, and the healthy-players check turns out never to have been statistically significant at either sample size. It leans that way, but it does not settle the objection, and it was written as though it did.</p>
       <p>So we built a manager who drafts with no positional plan and then, from week&nbsp;4, shops toward whatever is actually working. Worth <strong>+2.1 points a season</strong>.</p>
       <h3>Why neither one is the answer</h3>
-      <p>Both are real &mdash; a careful experiment detects them. Both are tiny. Here they are against the thing that was already in the data:</p>
+      <p>Both are real &mdash; a careful experiment detects them. Both are tiny. Here they are against the thing that was already in the data. (These two tests cover five of the seven seasons; the 2021 and 2022 runs are still in progress.)</p>
     </div>
     <div class="wide">
       <figure>
         <div class="fh">
           <h3>What each behaviour is actually worth</h3>
-          <p>Pooled across all five seasons and 25,000 paired leagues.</p>
+          <p>Pooled across five of the seven seasons; the 2021 and 2022 runs are still going.</p>
         </div>
         <div class="tablewrap" style="border-top:none">
           <table>
@@ -633,11 +637,11 @@
     </div>
     <div class="col">
       <ul class="plain">
-        <li><strong>Five seasons is not many.</strong> Every &ldquo;average across seasons&rdquo; on this page rests on five numbers. That is why almost all of the intervals in the main table cross zero, and why we have reported that rather than picking a winner.</li>
+        <li><strong>Seven seasons is not many.</strong> Every &ldquo;average across seasons&rdquo; on this page rests on seven numbers. That is why every interval in the main table still crosses zero, and why we have reported that rather than picking a winner.</li>
         <li><strong>Strategy explains about 10% of the variance.</strong> Playbook, quarterback timing and manager effort together account for roughly a tenth of how much a team scores. The other 90% is which players got hurt, which unknowns broke out, and who you drew each week. Rank twelve teams by strategy alone and the agreement with how they actually finish averages 0.21 &mdash; swinging by &plusmn;0.29, so a completely backwards prediction is a normal outcome.</li>
         <li><strong>This is one league format.</strong> 12-team, full PPR, one quarterback, ESPN scoring and roster slots. Superflex, half-PPR and deeper benches will behave differently, and the quarterback conclusions especially would not survive a second starting quarterback.</li>
         <li><strong>The playbook mix is an assumption.</strong> How common each strategy is was set from published draft advice, not from any real league. Every finding was re-tested against different mixes, but the field you actually play in is not this field.</li>
-        <li><strong>2021 and 2022 are missing</strong>, and 2020 is excluded deliberately. Before 2018 no weekly projection data exists anywhere we could find, which sets a hard floor on how far back the simulation can go.</li>
+        <li><strong>2021 and 2022 use a different projection source.</strong> Their ESPN files were never obtainable, so they are built from nflverse box scores plus FantasyPros consensus. We tested that rather than assuming it: rebuilding 2024 without its ESPN file reproduces the ESPN strategy ranking at +0.98, closer than a season agrees with itself. 2020 is excluded deliberately, and before 2018 no weekly projection data exists anywhere we could find, which sets a hard floor on how far back this can go.</li>
       </ul>
       <div class="pull">
         <p class="big">The advice shifts the odds. It does not decide the season.</p>
@@ -649,7 +653,7 @@
 
 <footer>
   <div class="wrap">
-    <p>Simulated with real 2018&ndash;2025 scoring, ESPN projections and Fantasy Football Calculator draft data. 25,000 leagues, 300,000 team-seasons.</p>
+    <p>Simulated with real 2018&ndash;2025 scoring, ESPN projections and Fantasy Football Calculator draft data. 35,000 leagues, 420,000 team-seasons.</p>
     <p>Method, code and the full written report are in the <a href="https://github.com/lewisweed/Fantasy-Football">project repository</a>.</p>
   </div>
 </footer>
@@ -663,25 +667,25 @@
   function svg(host,w,h){var s=el("svg",{viewBox:"0 0 "+w+" "+h,role:"img","aria-hidden":"false"});host.appendChild(s);return s;}
   var INK="var(--ink)",MUT="var(--muted)",HAIR="var(--hair)",ACC="var(--accent)",WARM="var(--warm)";
   var MONO='"IBM Plex Mono",monospace';
-  var YEARS=[2018,2019,2023,2024,2025];
+  var YEARS=[2018,2019,2021,2022,2023,2024,2025];
 
   var SLOPE=[
-    {n:"Zero RB",z:[1.79,-3.06,0.03,-2.12,-2.44],c:WARM,w:2.4},
-    {n:"Robust RB",z:[-1.66,0.38,-2.26,1.49,1.60],c:ACC,w:2.4},
-    {n:"Hero RB",z:[1.87,-0.14,-0.10,-1.44,0.48]},
-    {n:"Elite QB only",z:[-0.84,0.22,1.31,0.80,-0.69]},
-    {n:"Early QB",z:[-0.67,0.08,1.09,0.67,-0.56]},
-    {n:"QB streamer",z:[0.23,0.32,-1.27,0.15,0.35]},
-    {n:"Elite TE + early QB",z:[-0.54,-0.03,0.96,-0.59,-0.45]},
-    {n:"Elite TE",z:[0.14,0.44,0.57,-0.33,0.95]},
-    {n:"Late QB",z:[0.01,0.78,-0.29,0.29,0.42]},
-    {n:"Balanced",z:[-0.12,0.41,0.10,0.55,0.25]},
-    {n:"Backup-QB hoarder",z:[-0.20,0.60,-0.14,0.52,0.09]}
+    {n:"QB hoarder",z:[-0.2, 0.6, -0.08, 0.38, -0.14, 0.52, 0.09]},
+    {n:"Balanced",z:[-0.12, 0.41, 0.11, -0.24, 0.1, 0.55, 0.25]},
+    {n:"Early QB",z:[-0.67, 0.08, -0.64, 0.99, 1.09, 0.67, -0.56]},
+    {n:"Elite QB only",z:[-0.84, 0.22, 0.81, 0.38, 1.31, 0.8, -0.69]},
+    {n:"Elite TE",z:[0.14, 0.44, -0.23, 0.08, 0.57, -0.33, 0.95]},
+    {n:"Elite TE + early QB",z:[-0.54, -0.03, -1.63, 1.5, 0.96, -0.59, -0.45]},
+    {n:"Hero RB",z:[1.87, -0.14, -0.14, -0.1, -0.1, -1.44, 0.48]},
+    {n:"Late QB",z:[0.01, 0.78, 1.06, -0.73, -0.29, 0.29, 0.42]},
+    {n:"QB streamer",z:[0.23, 0.32, 2.1, -1.85, -1.27, 0.15, 0.35]},
+    {n:"Robust RB",z:[-1.66, 0.38, -0.08, -1.5, -2.26, 1.49, 1.6],c:ACC,w:2.4},
+    {n:"Zero RB",z:[1.79, -3.06, -1.28, 1.08, 0.03, -2.12, -2.44],c:WARM,w:2.4}
   ];
   var EFFORT=[
-    {n:"Active",v:[9.31,9.59,9.44,9.36,9.78],c:ACC},
-    {n:"Moderate",v:[7.56,7.33,7.46,7.70,7.17],c:MUT},
-    {n:"Lazy",v:[5.64,4.89,5.24,4.84,4.38],c:WARM}
+    {n:"Active",v:[9.31, 9.59, 9.51, 9.28, 9.44, 9.36, 9.78],c:ACC},
+    {n:"Moderate",v:[7.56, 7.33, 7.62, 7.49, 7.46, 7.7, 7.17],c:MUT},
+    {n:"Lazy",v:[5.64, 4.89, 4.31, 6.04, 5.24, 4.84, 4.38],c:WARM}
   ];
 
   function lineChart(id,series,opts){
