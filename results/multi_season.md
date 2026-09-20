@@ -595,7 +595,7 @@ points at a behaviour none of the eleven playbooks implements: **draft without a
 positional thesis, then let the first month tell you what kind of season it is
 and reallocate accordingly.** Section 9 tests it.
 
-## 9. Testing the behaviour: the in-season rebalancer
+## 9. Testing two behaviours: the rebalancer and the run-aware drafter
 
 Section 8 says the quantity that decides a season is invisible in August and
 largely resolved by early October. So we built a manager to exploit exactly
@@ -635,20 +635,65 @@ the manager out of James Conner, the season's biggest prize and a running back.
 The add counts do not support it: Conner's rate moves by 7 out of 257. The
 honest account is the general one above, not a narrative about one player.
 
-### What this rules out
+### The run-aware drafter, on all five seasons
 
-Two candidate behaviours were built and tested against the gap Section 8
-identifies. Both fail, in instructive ways:
+Section 9 was first written when only 2018 had finished, and it drew the wrong
+conclusion from it. The full five seasons:
 
-- **Reacting to the draft in front of you** (`adaptive_vona`) loses 9.2 points
-  a season in 2018 even after its confound is removed. Reacting to a positional
-  run means paying the run premium.
-- **Reacting to the season in front of you** (`rebalancer`) gains 2.1 points and
-  swings negative in two seasons of five.
+| season | points/season | 95% CI | titles |
+|---|---|---|---|
+| 2018 | **−9.2** | −12.1 to −6.4 | 8.34% → 7.62% |
+| 2019 | **+8.3** | +5.9 to +10.8 | 8.32% → 9.20% |
+| 2023 | +3.2 | +0.8 to +5.7 | 7.46% → 8.92% |
+| 2024 | **+10.5** | +8.1 to +13.0 | 8.80% → 8.74% |
+| 2025 | +0.7 | −1.8 to +3.3 | 7.86% → 8.66% |
+| **pooled** | **+2.7** | **+1.6 to +3.9** | 8.16% → 8.63% |
 
-The behaviour that does outperform every year was already in the data before we
-went looking for a clever one: **be an active manager.** Fifteen orderings out of
-fifteen, worth twenty to fifty times what either of these behaviours produced.
+**Correction.** On 2018 alone this report concluded that "reacting to a
+positional run means paying the run premium." Four more seasons falsify it.
+The behaviour is positive in four of five and pooled +2.7 points, slightly
+ahead of the rebalancer. 2018 is the exception, not the rule, and a single
+season was not enough to claim a mechanism — which is, with some irony, the
+entire thesis of this report.
+
+### How strong should the in-season tilt be?
+
+The rebalancer was tested at one tilt strength (0.10). To tell a genuinely weak
+lever from a badly chosen parameter, we re-ran its best and worst seasons at
+0.35:
+
+| season | strength 0.10 | strength 0.35 |
+|---|---|---|
+| 2018 | −6.2 | **−46.5** |
+| 2024 | +9.2 | +7.4 |
+
+Leaning harder does not capture more. In the season where the tilt already
+helped, tripling it made it slightly *worse*; in the season where it hurt, it
+was catastrophic. The downside scales and the upside does not, which is the
+signature of a real signal attached to a badly priced action: a strong
+positional tilt starts refusing genuinely good players because they play the
+position that is out of favour. The gentle version is not a compromise, it is
+the whole of the available edge.
+
+### What this actually rules out
+
+Both engineered behaviours are real and both are small:
+
+| | pooled points | title rate |
+|---|---|---|
+| run-aware drafter | +2.7 | 8.16% → 8.63% (+0.47pp) |
+| in-season rebalancer | +2.1 | 8.16% → 8.36% (+0.21pp) |
+| **being an active manager** | **+61 to +105** | **5.00% → 9.50% (+4.50pp)** |
+
+Neither clears the bar the question set — outperforming every season — and
+neither comes close to the effect that was already sitting in the data. The
+run-aware drafter manages four seasons out of five, which is the more
+interesting near-miss, but its title-rate interval still overlaps the baseline.
+
+The honest summary is that both ideas work, in the sense that a careful
+experiment can detect them, and neither matters much next to simply managing
+the roster. **The edge available from being cleverer at the draft is roughly a
+tenth of the edge available from paying attention after it.**
 
 ## 10. Draft slot: a correction to the single-season report
 
