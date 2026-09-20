@@ -1,0 +1,9 @@
+{
+  "year": 2019,
+  "n_players": 682,
+  "n_weeks": 16,
+  "tier": "espn+ffc",
+  "espn_file_present": true,
+  "ffc_file_present": true,
+  "calibration_years": []
+}

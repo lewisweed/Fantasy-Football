@@ -132,23 +132,34 @@ class SeasonConfig:
     adp_sd_scale: float = 1.35
 
 
+def short_season(**kw) -> SeasonConfig:
+    """A pre-2021 season: 17 NFL weeks, so 13 fantasy weeks and a week-16 final."""
+    return SeasonConfig(n_weeks=16, regular_weeks=13, playoff_weeks=(14, 15, 16), **kw)
+
+
+# Round-1 rules are read off each season's real ADP board rather than assumed.
+# Travis Kelce is the reason this has to be per-season: he went at pick 8.2 in
+# 2021 and 5.9 in 2023, so a tight end in round 1 was ordinary in those years
+# and a reach in the others, where the first tight end went between 16 and 27.
+#
+# The persona mix is deliberately held constant across seasons.  The question
+# these runs exist to answer is how a strategy performs when the *board* looks
+# a certain way, and letting the field composition move at the same time would
+# confound the two.  Varying the mix is a sensitivity check, not the design.
 SEASON_CONFIG = {
-    # Round-1 rules are read off that season's real ADP board, not assumed.
-    # 2023 is the one that matters: Travis Kelce went at pick 5.9, so a tight
-    # end in round 1 was ordinary rather than a reach.  In 2024 and 2025 the
-    # first tight end went at 24.4 and 27.1, which is round 3.
+    2018: short_season(year=2018),
+    2019: short_season(year=2019),
+    # 2020 is excluded: no preseason, opt-outs, and COVID-list absences that
+    # read as injuries in the roster data without being injuries.
+    2021: SeasonConfig(year=2021, round1_positions=(RB, WR, TE)),
+    2022: SeasonConfig(year=2022),
     2023: SeasonConfig(year=2023, round1_positions=(RB, WR, TE)),
     2024: SeasonConfig(year=2024),
     2025: SeasonConfig(year=2025),
 }
 
-#: Seasons the NFL played in 17 weeks, so fantasy ended in week 16.
-SHORT_SEASONS = (2018, 2019, 2020)
-
-
-def short_season(**kw) -> SeasonConfig:
-    """A pre-2021 season: 13-week regular season, final in week 16."""
-    return SeasonConfig(n_weeks=16, regular_weeks=13, playoff_weeks=(14, 15, 16), **kw)
+#: Seasons with both ESPN projections and real ADP, so they can be simulated.
+SIMULATABLE = tuple(sorted(SEASON_CONFIG))
 
 
 def season_config(year: int) -> SeasonConfig:
