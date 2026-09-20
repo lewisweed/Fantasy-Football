@@ -29,6 +29,17 @@ import pandas as pd
 from . import clean
 from .config import RAW
 
+#: Seasons whose board cannot be trusted, and why.
+EXCLUDED = {
+    2012: "FFC returned 93 players from 303 drafts -- about eight rounds deep, "
+          "so the replacement tier the depth metrics compare against does not exist",
+    2020: "COVID: no preseason, player opt-outs, and COVID-list absences that "
+          "read as injuries in the roster data without being injuries",
+}
+
+#: Every season with a usable draft board.
+PROFILED = tuple(y for y in range(2010, 2026) if y not in EXCLUDED)
+
 #: Roughly the last startable player at each position in a 12-team league.
 STARTERS = {"QB": 12, "RB": 30, "WR": 36, "TE": 12}
 #: The picks a manager spends real draft capital on.
@@ -115,6 +126,8 @@ def profile_season(year: int, n_weeks: int | None = None) -> dict | None:
     return out
 
 
-def profile_all(years) -> pd.DataFrame:
+def profile_all(years=PROFILED) -> pd.DataFrame:
+    """Board profiles for every season worth profiling."""
+    years = [y for y in years if y not in EXCLUDED]
     rows = [p for p in (profile_season(y) for y in years) if p is not None]
     return pd.DataFrame(rows).set_index("year")
