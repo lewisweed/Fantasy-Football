@@ -28,6 +28,8 @@ PERSONA_ID = {n: i for i, n in enumerate(PERSONA_NAMES)}
 #: league-average positional mix anchors that read before evidence arrives.
 RUN_WINDOW = 12
 RUN_PRIOR = 6.0
+#: How hard the run-aware drafter leans on a departure from normal pace.
+RUN_SENSITIVITY = 1.0
 #: Roughly the positional mix of a 16-round draft: QB RB WR TE K DST.
 _PICK_RATE_PRIOR = np.array([0.13, 0.32, 0.38, 0.11, 0.03, 0.03])
 
@@ -253,6 +255,8 @@ def run_draft(sd, rng: np.random.Generator, personas: np.ndarray,
     pbias = np.zeros(N_POS)
     ubias = np.zeros(N_POS)
     cliff = np.zeros(N_POS)
+    hot = np.zeros(N_POS)
+    norm = np.zeros(N_POS)
     look = np.zeros(N_POS)
     score = np.empty(sd.n)
 
@@ -276,15 +280,22 @@ def run_draft(sd, rng: np.random.Generator, personas: np.ndarray,
             universal_bias(int(personas[m]), rnd, counts[m], ubias)
             cliff_and_lookahead(sd, ok, pick + 1, next_pick_no, cliff, look)
             if PERSONA_NAMES[personas[m]] == "adaptive_vona":
-                # Read the pace of the last round of picks rather than August's
-                # guess at who survives.  The prior keeps it sane at pick 1,
-                # and fades as real evidence accumulates.
+                # React to the *deviation* from normal pace, not to pace
+                # itself.  Running backs and receivers always leave the board
+                # quickly because there are more slots to fill, and a drafter
+                # that treats raw speed as urgency simply reaches at those two
+                # positions all draft long.  Measuring the observed rate
+                # against the rate that was expected anyway isolates the part
+                # that is actually a run.
                 seen = recent[max(0, pick - RUN_WINDOW):pick]
+                gap_to_next = next_pick_no - (pick + 1)
                 rate = _PICK_RATE_PRIOR * RUN_PRIOR
                 if len(seen):
                     rate = rate + np.bincount(seen, minlength=N_POS)
                 rate = rate / rate.sum()
-                run_aware_lookahead(sd, ok, rate, next_pick_no - (pick + 1), look)
+                run_aware_lookahead(sd, ok, rate, gap_to_next, hot)
+                run_aware_lookahead(sd, ok, _PICK_RATE_PRIOR, gap_to_next, norm)
+                look += RUN_SENSITIVITY * (hot - norm)
             strength = max(3.0, 0.18 * (pick + 1))
             tilt = (pbias + ubias + cliff + look) * strength
             score -= tilt[sd.pos]

@@ -55,3 +55,72 @@ def all_stories(years=SEASONS, n_drafts: int = 3000) -> list[dict]:
     w = cs.strategy_table(list(years)).pivot(
         index="persona_name", columns="year", values="z")
     return [season_story(y, w[y], n_drafts) for y in years]
+
+
+def _md(df: pd.DataFrame, cols: dict, fmt: dict | None = None) -> str:
+    fmt = fmt or {}
+    head = "| " + " | ".join(cols.values()) + " |"
+    rule = "|" + "|".join("---" for _ in cols) + "|"
+    out = [head, rule]
+    for r in df.itertuples():
+        cells = []
+        for c in cols:
+            v = getattr(r, c)
+            cells.append(fmt.get(c, lambda x: f"{x}")(v))
+        out.append("| " + " | ".join(cells) + " |")
+    return "\n".join(out)
+
+
+def season_markdown(st: dict) -> str:
+    y, sh = st["year"], st["shape"]
+    n0 = lambda v: f"{v:+.0f}"
+    n1 = lambda v: f"{v:.1f}"
+    pc = lambda v: f"{v*100:.0f}%"
+    L = [f"### {y}", ""]
+    L.append(f"Best strategy **{st['best']}** ({st['best_z']:+.2f} sd above the "
+             f"field), worst **{st['worst']}** ({st['worst_z']:+.2f}).")
+    L.append("")
+    L.append("How the first five rounds paid off, by position — points versus "
+             "each player's own preseason projection, and games missed:")
+    L.append("")
+    L.append("| | QB | RB | WR | TE |")
+    L.append("|---|---|---|---|---|")
+    L.append(f"| points vs projection | {sh.qb_gap:+.0f} | {sh.rb_gap:+.0f} | "
+             f"{sh.wr_gap:+.0f} | {sh.te_gap:+.0f} |")
+    L.append(f"| games missed | {sh.qb_missed:.1f} | {sh.rb_missed:.1f} | "
+             f"{sh.wr_missed:.1f} | — |")
+    L.append("")
+    L.append("**What went wrong that nobody could have known.** Picks from the "
+             "first five rounds, by how far they fell short:")
+    L.append("")
+    L.append(_md(st["busts"], {"player": "player", "pos": "pos", "adp": "ADP",
+                               "expected": "projected", "actual": "scored",
+                               "gap": "gap", "missed": "games missed"},
+                 {"adp": n1, "expected": lambda v: f"{v:.0f}",
+                  "actual": lambda v: f"{v:.0f}", "gap": n0,
+                  "missed": lambda v: f"{v:.0f}"}))
+    L.append("")
+    L.append("**What went right that nobody could have known.** Players drafted "
+             "in round 8 or later, or not drafted at all:")
+    L.append("")
+    L.append(_md(st["hits"], {"player": "player", "pos": "pos", "adp": "ADP",
+                              "expected": "projected", "actual": "scored",
+                              "gap": "gap"},
+                 {"adp": n1, "expected": lambda v: f"{v:.0f}",
+                  "actual": lambda v: f"{v:.0f}", "gap": n0}))
+    L.append("")
+    L.append(f"**Why {st['best']} won.** Each player's contribution is how much "
+             "more (or less) often this strategy rostered him than the league "
+             "did, times how far he beat his projection:")
+    L.append("")
+    cols = {"player": "player", "pos": "pos", "adp": "ADP", "how": "",
+            "own": "this strategy", "field": "league", "gap": "his gap",
+            "edge": "points of edge"}
+    f = {"adp": n1, "own": pc, "field": pc, "gap": n0, "edge": n0}
+    L.append(_md(st["best_helped"], cols, f))
+    L.append("")
+    L.append(f"**Why {st['worst']} lost.**")
+    L.append("")
+    L.append(_md(st["worst_hurt"], cols, f))
+    L.append("")
+    return "\n".join(L)
