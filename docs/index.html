@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Five Thousand Seasons</title>
-<meta name="description" content="What 5,000 simulated 2025 fantasy football seasons say about draft strategy, quarterback timing, and how much any of it actually matters.">
+<meta name="description" content="Five real fantasy seasons, each simulated 5,000 times. The best draft strategy inverts from year to year, and nothing visible in August predicts which year you are in.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231A6FA0'/%3E%3Crect x='5' y='14.5' width='22' height='3' rx='1.5' fill='%23ffffff' fill-opacity='0.55'/%3E%3Ccircle cx='19' cy='16' r='4.5' fill='%23ffffff'/%3E%3C/svg%3E">
 <meta property="og:type" content="article">
-<meta property="og:site_name" content="Sigma Showdown analysis">
+<meta property="og:site_name" content="Five Thousand Seasons">
 <meta property="og:title" content="Five Thousand Seasons">
-<meta property="og:description" content="What 5,000 simulated 2025 fantasy football seasons say about draft strategy, quarterback timing, and how much any of it actually matters.">
+<meta property="og:description" content="Five real fantasy seasons, each simulated 5,000 times. The best draft strategy inverts from year to year, and nothing visible in August predicts which year you are in.">
 <meta property="og:url" content="https://lewisweed.github.io/Fantasy-Football/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Five Thousand Seasons">
-<meta name="twitter:description" content="What 5,000 simulated 2025 fantasy football seasons say about draft strategy, quarterback timing, and how much any of it actually matters.">
+<meta name="twitter:description" content="Five real fantasy seasons, each simulated 5,000 times. The best draft strategy inverts from year to year, and nothing visible in August predicts which year you are in.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
@@ -168,24 +168,25 @@
 <header class="hero">
   <div class="wrap">
     <div class="hero-stack">
-      <p class="eyebrow">A fantasy football experiment &middot; 2025 season</p>
+      <p class="eyebrow">A fantasy football experiment &middot; five seasons</p>
       <h1>Five Thousand Seasons</h1>
-      <p class="lede">We rebuilt the 2025 fantasy season inside a computer and played it five thousand times, with twelve managers drafting, streaming and setting lineups in every one. Here is what actually won &mdash; and how much of it was luck.</p>
+      <p class="lede">We rebuilt five real fantasy seasons inside a computer and played each of them five thousand times, with twelve managers drafting, streaming and setting lineups in every one. We went looking for the best draft strategy. What we found instead is that the answer changes every year &mdash; and nothing you can see in August tells you which year you are about to play.</p>
       <dl class="keyfacts">
-        <div><dt>Leagues played</dt><dd>5,000</dd></div>
-        <div><dt>Teams managed</dt><dd>60,000</dd></div>
+        <div><dt>Seasons</dt><dd>5</dd></div>
+        <div><dt>Leagues played</dt><dd>25,000</dd></div>
+        <div><dt>Team-seasons</dt><dd>300,000</dd></div>
         <div><dt>Format</dt><dd>12-tm PPR</dd></div>
-        <div><dt>Real season</dt><dd>2025</dd></div>
       </dl>
       <nav class="toc">
         <a href="#read">How to read this</a>
         <a href="#playbooks">The playbooks</a>
-        <a href="#strategies">What won</a>
+        <a href="#finding">The finding</a>
+        <a href="#why">What decides a season</a>
+        <a href="#august">Can you see it coming</a>
+        <a href="#seasons">Season by season</a>
+        <a href="#effort">What always worked</a>
         <a href="#qb">The QB question</a>
-        <a href="#which-qb">Which QB</a>
-        <a href="#effort">Effort</a>
         <a href="#slot">Draft slot</a>
-        <a href="#matters">Does any of it matter</a>
         <a href="#how">How it works</a>
       </nav>
     </div>
@@ -195,33 +196,35 @@
 <section id="read">
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Start here</p>
+      <p class="eyebrow">Before anything else</p>
       <h2>How to read the numbers</h2>
-      <p>Four ideas do all the work on this page. None of them are complicated, but every chart below assumes you know them.</p>
+      <p>Four terms do most of the work on this page. None of them are complicated, but guessing at them will make the conclusions look either stronger or weaker than they are.</p>
     </div>
-    <div class="col">
+    <div class="wide">
       <div class="defgrid">
         <div class="def">
-          <h3>Fair share &mdash; 8.33%</h3>
-          <p>Twelve teams, one champion. If every manager were identical, each would win <span class="num">1&divide;12&nbsp;=&nbsp;8.33%</span> of the time. That is the line to beat. A strategy at 6% is <em>losing</em> to a manager who does nothing in particular; a strategy at 10% is genuinely ahead.</p>
+          <h3>Standing (z&#8209;score)</h3>
+          <p>How far a strategy&rsquo;s teams scored above or below the league average <em>that season</em>, measured in standard deviations. <strong>0 is exactly average; +1.0 means a full standard deviation better than the field.</strong> We use it instead of raw points because a point is worth more in a low-scoring year.</p>
         </div>
         <div class="def">
           <h3>Confidence interval</h3>
-          <p>The range the true number probably sits in, written like <span class="num">9.9&ndash;11.7%</span>. We only played 5,000 seasons, not infinite ones, so every figure has some wobble. <strong>If two intervals overlap, the two things are not meaningfully different</strong> &mdash; that is the single most useful habit for reading this page.</p>
+          <p>The range the true answer plausibly sits in. <strong>If an interval crosses zero, the result is consistent with no effect at all</strong> &mdash; the honest reading is &ldquo;we cannot tell,&rdquo; not &ldquo;slightly better.&rdquo;</p>
         </div>
         <div class="def">
-          <h3>Counterfactual</h3>
-          <p>Replaying <em>the same league</em> with one thing changed. We re-ran each season with one manager forced to draft a quarterback in a set round, everything else untouched, and compared him to himself. It is the difference between &ldquo;teams that did X won more&rdquo; and &ldquo;doing X makes you win more&rdquo; &mdash; which are not the same claim.</p>
+          <h3>Rank agreement</h3>
+          <p>Whether two seasons order the strategies the same way. <strong>+1 is identical, 0 is unrelated, &minus;1 is exactly backwards.</strong> This is the number that settles whether a strategy travels from one year to the next.</p>
         </div>
         <div class="def">
-          <h3>Variance explained</h3>
-          <p>How much of the outcome a factor actually accounts for. If draft strategy explains 10% of your season, the other 90% is injuries, breakouts, and who you happened to play each week. It is the honest ceiling on advice.</p>
+          <h3>Points vs projection</h3>
+          <p>What a player actually scored minus what he was projected to score in August. It is pure hindsight, used only to <em>explain</em> results. No simulated manager ever sees it.</p>
         </div>
       </div>
     </div>
+    <div class="col">
+      <p>One rule governs the whole simulation: <strong>every manager decides using only what was knowable at that moment.</strong> They do not know who gets hurt in week 9. They do not know which rookie breaks out. They draft from August rankings, react to injuries as they are reported, and work the waiver wire with the same blind spots a real person has.</p>
+    </div>
   </div>
 </section>
-
 <section id="playbooks">
   <div class="wrap">
     <div class="sec-head">
@@ -261,94 +264,173 @@
     </div>
   </div>
 </section>
-
-<section id="strategies">
+<section id="finding">
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Question one</p>
-      <h2>Which draft strategy wins?</h2>
-      <p>Each simulated manager drafts with a persona &mdash; a tendency, not a rule. A Zero&nbsp;RB manager avoids running backs early but will still take one if the value is obvious, exactly like a real person would.</p>
+      <p class="eyebrow">The finding</p>
+      <h2>The best strategy changes every year &mdash; violently</h2>
+      <p>This is the chart the project was built to produce, and it is not the chart we expected. Each line is one strategy, tracked across five seasons. If any strategy were reliably good, its line would stay high.</p>
     </div>
     <div class="wide">
       <figure>
         <div class="fh">
-          <h3>Championship rate by draft persona</h3>
-          <p>Dot is the estimate; the bar is the 95% confidence interval. Orange marks a strategy whose <em>whole</em> interval sits below fair share.</p>
+          <h3>Every strategy&rsquo;s standing, season by season</h3>
+          <p>Above the dashed line is better than the league average that season; below it is worse. Zero&nbsp;RB and Robust&nbsp;RB are highlighted because they swing hardest.</p>
         </div>
-        <div class="plot"><div id="c-persona"></div></div>
-        <figcaption>Read the bars, not the dots. Elite&nbsp;TE, QB&nbsp;streamer and Robust&nbsp;RB all clear fair share; their intervals overlap each other, so treating them as a three-way tie is more honest than ranking them. Zero&nbsp;RB is the only persona that is unambiguously bad.</figcaption>
-        <div class="tablewrap">
-          <table id="t-persona"><thead><tr><th>Persona</th><th>Title&nbsp;%</th><th>95% CI</th><th>&times;&nbsp;fair share</th><th>Playoffs&nbsp;%</th><th>Season pts</th></tr></thead><tbody></tbody></table>
-        </div>
-      </figure>
-    </div>
-    <div class="col">
-      <div class="pull">
-        <p class="big">Zero RB didn&rsquo;t just lose finals. It missed the playoffs.</p>
-        <p class="sub">Zero RB made the playoffs 39.9% of the time against roughly 50% for everyone else. It lost in the regular season, which means the strategy failed &mdash; not that it ran into bad luck in December.</p>
-      </div>
-      <p>The spread from best to worst here is wider than anything the quarterback tables produce. Whatever you take from this page, <strong>how you build the rest of the roster mattered more than when you took a quarterback.</strong></p>
-    </div>
-  </div>
-</section>
-
-<section id="qb">
-  <div class="wrap">
-    <div class="sec-head">
-      <p class="eyebrow">Question two</p>
-      <h2>When should you draft a quarterback?</h2>
-      <p>This is the question the project was built for, and it is the one where the obvious answer is wrong in an interesting way.</p>
-    </div>
-    <div class="col">
-      <p>The tempting approach is to sort teams by when they took their first quarterback and compare. Do that and you get a clean story: rounds 2&ndash;3 won 5.98% of titles, rounds 10 and later won 9.90%. Wait, obviously.</p>
-      <p>But that comparison is contaminated. The managers who reach for a quarterback in round&nbsp;2 are <em>also</em> the managers doing other things differently, and those other things are in the number too. To separate them you have to replay the same league and change only one thing.</p>
-    </div>
-    <div class="wide">
-      <figure>
-        <div class="fh">
-          <h3>What forcing a quarterback into a given round actually costs</h3>
-          <p>Season points gained or lost against the same manager, in the same league, drafting his own way. Bars are 95% confidence intervals.</p>
-        </div>
+        <div class="plot" id="slope"></div>
         <div class="legend">
-          <span><span class="swatch" style="background:var(--warm)"></span> worse than drafting naturally</span>
-          <span><span class="swatch" style="background:var(--accent)"></span> better</span>
+          <span><span class="swatch" style="background:var(--warm)"></span>Zero RB</span>
+          <span><span class="swatch" style="background:var(--accent)"></span>Robust RB</span>
+          <span><span class="swatch" style="background:var(--muted)"></span>the other nine</span>
         </div>
-        <div class="plot"><div id="c-cf"></div></div>
-        <figcaption>Rounds 2 and 3 are real mistakes, costing 18 and 12 points across a season. Every round from 4 to 12 is worth roughly the same as every other &mdash; a plateau, not a slope. The lesson is &ldquo;don&rsquo;t reach,&rdquo; not &ldquo;wait as long as possible.&rdquo;</figcaption>
+        <figcaption>Hover any line to isolate it. 2020 is excluded (no preseason, opt-outs, COVID-list absences); 2021 and 2022 are not yet simulated.</figcaption>
       </figure>
     </div>
     <div class="col">
-      <div class="pull">
-        <p class="big">The mistake is the early reach, not the timing after it.</p>
-        <p class="sub">Round 5 looks like the peak, but rounds 4 through 12 all sit inside each other&rsquo;s intervals. Anywhere in that range is fine. Rounds 2 and 3 are not.</p>
-      </div>
-      <p>There is a second clue in the raw data that points the same way. Teams that spent a round-2 pick on a quarterback got <span class="num">18.2</span> points a game out of the position. Teams that waited until round 10 or later got <span class="num">17.6</span>. <strong>Paying up bought about half a point a game.</strong> It cost a pick that could have been a starting running back.</p>
-    </div>
-  </div>
-</section>
-
-<section id="which-qb">
-  <div class="wrap">
-    <div class="sec-head">
-      <p class="eyebrow">Question two, continued</p>
-      <h2>Which quarterbacks were worth it?</h2>
-      <p>The same question asked player by player: what did he cost, and what did the teams that drafted him actually do?</p>
+      <p><strong>Zero&nbsp;RB is the best strategy in the dataset and the worst strategy in the dataset.</strong> In 2018 it finished +1.79, first of eleven. In 2019 it finished &minus;3.06, last by a mile. Robust&nbsp;RB does the same thing in reverse: worst in 2023, best in 2024.</p>
+      <p>These are not small samples wobbling. Within any single season each of these gaps is measured across tens of thousands of teams and is extremely precise. The lines really do cross.</p>
     </div>
     <div class="wide">
       <figure>
         <div class="fh">
-          <h3>Draft cost against championship rate</h3>
-          <p>Each dot is the first quarterback a team drafted. Horizontal line is fair share.</p>
+          <h3>Five-season averages, with confidence intervals</h3>
+          <p>Standing averaged over the five seasons. The interval is the range the true long-run value plausibly occupies.</p>
         </div>
-        <div class="plot"><div id="c-qbs"></div></div>
-        <figcaption>Everything above the line returned more than an average team wins by default; everything below returned less. The five quarterbacks drafted in the first four rounds are all beneath it.</figcaption>
+        <div class="tablewrap" style="border-top:none">
+          <table>
+            <thead><tr><th>Strategy</th><th>2018</th><th>2019</th><th>2023</th><th>2024</th><th>2025</th><th>Average</th><th>95% interval</th><th>Verdict</th></tr></thead>
+            <tbody>
+<tr><td><strong>Elite TE</strong></td><td>+0.14</td><td>+0.44</td><td>+0.57</td><td class="lo">&minus;0.33</td><td class="hi">+0.95</td><td>+0.35</td><td>&minus;0.24 to +0.95</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Late QB</strong></td><td>+0.01</td><td>+0.78</td><td class="lo">&minus;0.29</td><td>+0.29</td><td>+0.42</td><td>+0.24</td><td>&minus;0.26 to +0.75</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Balanced</strong></td><td class="lo">&minus;0.12</td><td>+0.41</td><td>+0.10</td><td>+0.55</td><td>+0.25</td><td>+0.24</td><td>&minus;0.09 to +0.56</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Backup-QB hoarder</strong></td><td class="lo">&minus;0.20</td><td>+0.60</td><td class="lo">&minus;0.14</td><td>+0.52</td><td>+0.09</td><td>+0.17</td><td>&minus;0.28 to +0.63</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Elite QB only</strong></td><td class="lo">&minus;0.84</td><td>+0.22</td><td class="hi">+1.31</td><td>+0.80</td><td class="lo">&minus;0.69</td><td>+0.16</td><td>&minus;0.99 to +1.32</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Hero RB</strong></td><td class="hi">+1.87</td><td class="lo">&minus;0.14</td><td class="lo">&minus;0.10</td><td class="lo">&minus;1.44</td><td>+0.48</td><td>+0.13</td><td>&minus;1.35 to +1.62</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Early QB</strong></td><td class="lo">&minus;0.67</td><td>+0.08</td><td class="hi">+1.09</td><td>+0.67</td><td class="lo">&minus;0.56</td><td>+0.12</td><td>&minus;0.83 to +1.07</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>QB streamer</strong></td><td>+0.23</td><td>+0.32</td><td class="lo">&minus;1.27</td><td>+0.15</td><td>+0.35</td><td>&minus;0.04</td><td>&minus;0.90 to +0.81</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Robust RB</strong></td><td class="lo">&minus;1.66</td><td>+0.38</td><td class="lo">&minus;2.26</td><td class="hi">+1.49</td><td class="hi">+1.60</td><td>&minus;0.09</td><td>&minus;2.31 to +2.12</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Elite TE + early QB</strong></td><td class="lo">&minus;0.54</td><td class="lo">&minus;0.03</td><td class="hi">+0.96</td><td class="lo">&minus;0.59</td><td class="lo">&minus;0.45</td><td>&minus;0.13</td><td>&minus;0.94 to +0.68</td><td>can&rsquo;t tell</td></tr>
+<tr><td><strong>Zero RB</strong></td><td class="hi">+1.79</td><td class="lo">&minus;3.06</td><td>+0.03</td><td class="lo">&minus;2.12</td><td class="lo">&minus;2.44</td><td>&minus;1.16</td><td>&minus;3.66 to +1.34</td><td>can&rsquo;t tell</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figcaption>Blue marks a strategy&rsquo;s best season, orange its worst. Every interval in the table crosses zero.</figcaption>
       </figure>
     </div>
     <div class="col">
-      <p><strong>Josh Allen is the clearest case on the page.</strong> He scored <span class="num">21.9</span> points a game, the most of any quarterback in the simulation, and did exactly what you drafted him to do. Teams that opened with him still won just <span class="num">7.28%</span> of titles &mdash; below the 8.33% you get for showing up. The pick worked and the team still lost ground, because a round-2 pick spent on a quarterback is a running back or receiver you do not have.</p>
-      <p>Drake Maye, typically available around round&nbsp;11, delivered <span class="num">19.3</span> points a game and a <span class="num">13.25%</span> title rate &mdash; the best on the board, at a twentieth of the cost.</p>
-      <div class="tablewrap" style="border:1px solid var(--hair); border-radius:3px; background:var(--surface)">
-        <table id="t-qbs"><thead><tr><th>First QB drafted</th><th>Avg round</th><th>Title&nbsp;%</th><th>QB pts/gm</th></tr></thead><tbody></tbody></table>
+      <div class="pull">
+        <p class="big">Not one of the eleven strategies has a five-season average distinguishable from the field.</p>
+        <p class="sub">Including Zero&nbsp;RB, which is worst overall by a distance &mdash; and whose interval still reaches +1.34, because in 2018 it was the best strategy on the board.</p>
+      </div>
+      <h3>Is the ranking just noise?</h3>
+      <p>No, and this is the part that makes the finding sharp. We measured the same thing two ways.</p>
+      <p><strong>Do seasons agree with each other?</strong> Rank agreement between any two seasons averages <span class="num">&minus;0.11</span>, and between 2018 and 2024 it is <span class="num">&minus;0.84</span> &mdash; nearly a perfect reversal. Shuffling eleven strategies at random gives 0.00&nbsp;&plusmn;&nbsp;0.32, so &minus;0.11 is indistinguishable from no relationship at all.</p>
+      <p><strong>Does a season agree with itself?</strong> Split one season&rsquo;s leagues into two halves and rank the strategies separately in each. Agreement is <span class="num">+0.93</span>.</p>
+      <p>So the measurement is nearly perfect, and it still does not travel. A season&rsquo;s ranking is real, precise, and <em>about that season</em>. That is the cleanest way this question can be settled with the data available.</p>
+    </div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">The mechanism</p>
+      <h2>What actually decides a season</h2>
+      <p>If the winner changes every year, something must be changing. It is not subtle: it is whether the running backs or the receivers taken in the first five rounds lived up to their projections.</p>
+    </div>
+    <div class="wide">
+      <figure>
+        <div class="fh">
+          <h3>How the first five rounds paid off</h3>
+          <p>Average points above or below each pick&rsquo;s own preseason projection. Every column is negative because projections price a full healthy season; the <em>differences</em> are what matter.</p>
+        </div>
+        <div class="tablewrap" style="border-top:none">
+          <table>
+            <thead><tr><th>Season</th><th>QB</th><th>RB</th><th>WR</th><th>TE</th><th>RB minus WR</th><th>Best strategy</th><th>Worst</th></tr></thead>
+            <tbody>
+<tr><td><strong>2018</strong></td><td>&minus;18</td><td class="lo">&minus;38</td><td>&minus;9</td><td>&minus;15</td><td class="lo">&minus;30</td><td>Hero RB</td><td>Robust RB</td></tr>
+<tr><td><strong>2019</strong></td><td>&minus;28</td><td>&minus;31</td><td>&minus;32</td><td class="lo">&minus;45</td><td>+1</td><td>Late QB</td><td>Zero RB</td></tr>
+<tr><td><strong>2023</strong></td><td>&minus;46</td><td class="lo">&minus;61</td><td>&minus;30</td><td>&minus;18</td><td class="lo">&minus;31</td><td>Elite QB only</td><td>Robust RB</td></tr>
+<tr><td><strong>2024</strong></td><td>+2</td><td class="hi">0</td><td>&minus;40</td><td>&minus;26</td><td class="hi">+41</td><td>Robust RB</td><td>Zero RB</td></tr>
+<tr><td><strong>2025</strong></td><td class="lo">&minus;88</td><td>&minus;41</td><td>&minus;60</td><td>&minus;41</td><td class="hi">+19</td><td>Robust RB</td><td>Zero RB</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figcaption>2025 is the most quarterback-hostile season in the set by roughly double. 2024 is the only season in which early running backs simply met expectations.</figcaption>
+      </figure>
+    </div>
+    <div class="col">
+      <p>That last column explains almost everything. Correlate it with how each strategy did:</p>
+      <ul class="plain">
+        <li><strong>Robust RB: <span class="num">+0.95</span>.</strong> Its season is decided by that one number almost entirely.</li>
+        <li><strong>Zero RB: <span class="num">&minus;0.76</span>.</strong> The same bet, taken from the other side.</li>
+        <li><strong>Balanced: <span class="num">+0.87</span>.</strong> Worth naming honestly &mdash; a manager who just follows consensus inherits a running-back-heavy early board in this era, and carries much of the same exposure without ever choosing it.</li>
+      </ul>
+      <div class="pull">
+        <p class="big">Robust RB and Zero RB are not really strategies. They are leveraged bets on one number.</p>
+        <p class="sub">A number that is not knowable until December.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="august">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">The question that would make this useful</p>
+      <h2>Can you tell in August which season you are in?</h2>
+      <p>If you could, everything above becomes actionable: read the board, pick the matching strategy, win. So we tested it properly, on more seasons than we could simulate.</p>
+    </div>
+    <div class="col">
+      <p>We profiled <strong>fourteen draft boards, 2010 through 2025</strong>, on nine things a manager can see before drafting: how many running backs and receivers go in the top 24, where the first quarterback and the first tight end leave the board, and how steep each position&rsquo;s tier cliff is. Then we asked whether any of them predicted how that season actually paid off.</p>
+      <p>One of the nine cleared the usual bar: the receiver tier cliff, at r&nbsp;=&nbsp;&minus;0.63. Taken alone that reads as significant.</p>
+      <p><strong>But nine things were tested.</strong> When you run nine tests, the chance that at least one clears that bar by luck alone is about 37%, and this one does not survive the standard correction for having done so. It is a hypothesis worth checking against future seasons, not a result.</p>
+      <p>Market pricing fails the same test independently: across those fourteen seasons, the correlation between what a position <em>cost</em> in August and what it <em>returned</em> runs between &minus;0.35 and +0.08, none of them significant.</p>
+      <div class="pull">
+        <p class="big">Nothing observable before the draft predicts which kind of season you are about to play.</p>
+        <p class="sub">Which is exactly why the strategy that wins keeps changing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="seasons">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">The stories behind the swings</p>
+      <h2>Season by season, with names</h2>
+      <p>Averages hide the thing worth understanding. Each of these seasons was decided by a handful of players, and in almost every case by something nobody could have priced in August.</p>
+    </div>
+    <div class="wide">
+      <div class="defgrid" style="grid-template-columns:1fr">
+        <div class="def">
+          <h3>2018 &mdash; the holdout that made the season <span class="num" style="color:var(--muted);font-weight:400">&middot; won by Hero RB, +1.87</span></h3>
+          <p><strong>Le&rsquo;Veon Bell was the third pick of the average draft and scored nothing at all.</strong> He sat out the entire season in a franchise-tag dispute and never reported &mdash; something no projection can price, because holdouts of that length essentially do not happen. Behind him the whole early running-back board came apart: Devonta Freeman (10 games missed), Dalvin Cook, Leonard Fournette, LeSean McCoy. Early backs finished 38 points under projection while receivers lost only 9.</p>
+          <p><strong>The twist:</strong> the single largest windfall anywhere in the dataset was James Conner &mdash; Bell&rsquo;s own backup &mdash; who went at pick 157 and scored 215 points above projection. The event that destroyed Robust&nbsp;RB created the season&rsquo;s best value, and it was sitting there for anyone in the last third of the draft.</p>
+          <p>Hero&nbsp;RB won by holding <em>one</em> back instead of three and having the roster space to absorb Conner. Zero&nbsp;RB posted its best season ever at +1.79 &mdash; the single reason it cannot simply be called a bad strategy.</p>
+        </div>
+        <div class="def">
+          <h3>2019 &mdash; the flat board that still sank Zero RB <span class="num" style="color:var(--muted);font-weight:400">&middot; won by Late QB, +0.78</span></h3>
+          <p>The most instructive season in the set, because <strong>the board was level</strong>: early backs finished 31 points under projection, early receivers 32. Neither position had an edge. And Zero&nbsp;RB still recorded &minus;3.06, the worst single-season result of any strategy in five years.</p>
+          <p>The reason matters. Zero&nbsp;RB does not need backs to bust in order to win &mdash; it needs <em>receivers to outperform</em>, and in 2019 they did not. Antonio Brown, drafted 21st on average, played one game. Davante Adams was the strategy&rsquo;s single largest loss. A roster that concedes a position with two starting slots and a flex has to be paid somewhere; on a neutral board it is not, and it loses badly.</p>
+          <p>Late&nbsp;QB won on one player: <strong>Lamar Jackson, available at pick 98</strong>, who produced a unanimous-MVP season worth 110 points over projection. Waiting at quarterback is a good idea precisely when someone like that is sitting in round eight &mdash; and there is no way to know in August that he is.</p>
+        </div>
+        <div class="def">
+          <h3>2023 &mdash; winning by not being there <span class="num" style="color:var(--muted);font-weight:400">&middot; won by Elite QB only, +1.31</span></h3>
+          <p>The worst running-back season in the set, 61 points under projection, and the damage was injury rather than underperformance: <strong>Nick Chubb&rsquo;s knee in week 2, J.K. Dobbins&rsquo; Achilles in week 1</strong>, Jonathan Taylor and Aaron Jones six games each. Justin Jefferson, the first pick of the average draft, missed seven.</p>
+          <p>This is the cleanest example in the project of winning by avoidance. Every one of Elite&nbsp;QB&nbsp;only&rsquo;s five largest contributions is a player it <em>did not have</em>: <strong>Aaron Rodgers, who tore his Achilles four snaps into the season</strong>, Deshaun Watson, Anthony Richardson, Daniel Jones. By spending a round 2&ndash;4 pick on a top quarterback it was never shopping in the aisle where every mid-tier option detonated. It did not find a bargain. It simply was not standing there when the floor gave way.</p>
+        </div>
+        <div class="def">
+          <h3>2024 &mdash; the distinction that matters most <span class="num" style="color:var(--muted);font-weight:400">&middot; won by Robust RB, +1.49</span></h3>
+          <p>A mirror of 2018. Early backs finished exactly on projection and early receivers 40 points under &mdash; the most RB-friendly board of the five.</p>
+          <p>And here is the nuance this whole report turns on. <strong>The single biggest bust of 2024 was a running back:</strong> Christian McCaffrey, first pick of the average draft, 228 points under projection with nine games missed. A reader who knew only that would conclude 2024 punished running backs. The opposite is true &mdash; the <em>class</em> delivered, with Barkley, Henry, Gibbs, Jacobs and Montgomery all paying off and Chuba Hubbard and Bucky Irving arriving off the wire.</p>
+          <p>&ldquo;The top running back busted&rdquo; and &ldquo;running backs were a bad investment&rdquo; are different claims, and only the second has anything to do with strategy. The real damage was at receiver &mdash; Chris Olave, Brandon Aiyuk, Christian Kirk &mdash; which is exactly where Zero&nbsp;RB had spent its early picks.</p>
+        </div>
+        <div class="def">
+          <h3>2025 &mdash; the season that misled us <span class="num" style="color:var(--muted);font-weight:400">&middot; won by Robust RB, +1.60</span></h3>
+          <p>The most quarterback-hostile season of the five by a wide margin: early quarterbacks finished 88 points under projection, roughly double the next-worst year. <strong>Joe Burrow and Jayden Daniels, both going in round 3, were the two largest busts anywhere in the first five rounds</strong>, at &minus;214 and &minus;192. Between them they account for more than the whole of Early&nbsp;QB&rsquo;s season deficit.</p>
+          <p>Receivers were nearly as bad, 60 points under, with Malik Nabers, Tyreek Hill, Mike Evans, Terry McLaurin and Calvin Ridley all missing six games or more. Running backs were poor in absolute terms but 19 points better than receivers, and the waiver crop was extraordinary &mdash; Rico Dowdle, Quinshon Judkins and Kyle Monangai were all essentially free.</p>
+          <p><strong>An earlier version of this page was built on 2025 alone.</strong> It advised drafting a quarterback late and called Zero&nbsp;RB unambiguously bad. Both statements describe 2025 accurately. Neither survives contact with 2018.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -357,86 +439,140 @@
 <section id="effort">
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">The thing nobody drafts for</p>
-      <h2>Paying attention beat every draft strategy</h2>
+      <p class="eyebrow">The one thing that held</p>
+      <h2>Paying attention worked every single year</h2>
+      <p>Set this chart next to the first one. The strategy lines cross constantly. These three never touch.</p>
     </div>
     <div class="wide">
       <figure>
         <div class="fh">
           <h3>Championship rate by how active the manager was</h3>
-          <p><strong>Active</strong> (55% of managers) works the wire every week, submits up to three claims and makes about 18 moves a season. <strong>Moderate</strong> (35%) checks most weeks and makes about 9. <strong>Lazy</strong> (10%) checks roughly half the weeks, makes about 4, and forgets to fix a lineup around one week in five.</p>
+          <p>Active managers work the wire weekly and make about 18 moves a season; moderate about 9; lazy check roughly half the weeks, make about 4, and forget to fix a lineup around one week in five.</p>
         </div>
-        <div class="plot"><div id="c-act"></div></div>
-        <figcaption>A 4.8-point gap in title rate, and more than a hundred season points &mdash; larger than the distance between the best and worst draft persona. None of it happens on draft day.</figcaption>
-        <div class="tablewrap">
-          <table id="t-act"><thead><tr><th>Manager</th><th>Title&nbsp;%</th><th>95% CI</th><th>Playoffs&nbsp;%</th><th>Season pts</th><th>Moves</th></tr></thead><tbody></tbody></table>
+        <div class="plot" id="effortplot"></div>
+        <div class="legend">
+          <span><span class="swatch" style="background:var(--accent)"></span>Active</span>
+          <span><span class="swatch" style="background:var(--muted)"></span>Moderate</span>
+          <span><span class="swatch" style="background:var(--warm)"></span>Lazy</span>
         </div>
+        <figcaption>Fair share in a 12-team league is 8.33%. The active&ndash;lazy gap ranges from 3.7 to 5.4 percentage points, and the ordering holds in all five seasons.</figcaption>
       </figure>
     </div>
     <div class="col">
-      <p>This is the least glamorous finding and probably the most useful one. The draft is a single afternoon that everyone agonises over; the waiver wire is fourteen small decisions that most people skip.</p>
+      <p>Active beats moderate beats lazy in <strong>all five seasons, on both title rate and total scoring &mdash; fifteen orderings out of fifteen.</strong> The scoring gap runs from 61 to 105 points a season.</p>
+      <p>Now compare that to the table further up, where not one draft strategy separated from the field over the same five years.</p>
+      <div class="pull">
+        <p class="big">How you draft is a bet on the season. Whether you manage the roster afterwards is not.</p>
+        <p class="sub">This is the least glamorous finding in the project and comfortably the most useful. The draft is one afternoon everybody agonises over; the waiver wire is fourteen small decisions most people skip.</p>
+      </div>
     </div>
   </div>
 </section>
-
+<section id="qb">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">The original question</p>
+      <h2>Where should you draft a quarterback?</h2>
+      <p>This is what the project was built to answer, and the five-season view changes the answer from a rule into a warning.</p>
+    </div>
+    <div class="col">
+      <p>The simulation&rsquo;s cleanest test replays identical leagues &mdash; same players, same injuries, same opponents &mdash; changing only the round in which one team is forced to take its first quarterback. In 2025 that test says: <strong>do not pay up.</strong> Forcing a quarterback in round 2 cost 18 points a season against the same manager&rsquo;s normal behaviour; waiting until round 5 gained 17.</p>
+      <p>Then we measured the same thing across fourteen real draft boards, 2010 to 2025, by asking how much more the quarterbacks taken early returned than the ones taken late.</p>
+    </div>
+    <div class="wide">
+      <figure>
+        <div class="fh">
+          <h3>What paying up for a quarterback was worth, by season</h3>
+          <p>Points of surplus the premium quarterbacks returned over the late ones. Positive means the early pick paid for itself.</p>
+        </div>
+        <div class="tablewrap" style="border-top:none">
+          <table>
+            <thead><tr><th>Season</th><th>&rsquo;10</th><th>&rsquo;11</th><th>&rsquo;13</th><th>&rsquo;14</th><th>&rsquo;15</th><th>&rsquo;16</th><th>&rsquo;17</th><th>&rsquo;18</th><th>&rsquo;19</th><th>&rsquo;21</th><th>&rsquo;22</th><th>&rsquo;23</th><th>&rsquo;24</th><th>&rsquo;25</th></tr></thead>
+            <tbody>
+<tr><td><strong>QB</strong></td><td class="hi">+88</td><td class="hi">+139</td><td class="hi">+101</td><td class="hi">+94</td><td class="lo">&minus;17</td><td>+8</td><td>+26</td><td>+38</td><td>+30</td><td class="hi">+132</td><td class="hi">+140</td><td class="hi">+120</td><td>+58</td><td class="lo">&minus;12</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figcaption>Running backs, receivers and tight ends were never negative in any of the fourteen seasons. Quarterback is the only position where paying up has ever been a losing trade &mdash; and it has been, twice.</figcaption>
+      </figure>
+    </div>
+    <div class="col">
+      <p><strong>2025 is the second-worst quarterback season in fifteen years.</strong> Only 2015 was worse. In twelve of the fourteen seasons, paying up for a quarterback was worth it, sometimes enormously &mdash; +140 in 2022, +139 in 2011.</p>
+      <p>So the honest version of the advice is not &ldquo;wait on quarterback.&rdquo; It is this: quarterback is <strong>the only position where the premium has ever failed to pay</strong>, which makes it the position where paying up carries real risk &mdash; and 2025 happened to be one of the two seasons where that risk landed. Burrow and Daniels, both round-3 picks, were the two biggest busts in the entire first five rounds.</p>
+      <div class="pull">
+        <p class="big">A rule read off 2025 would have told you to wait. It would have been wrong in twelve of the previous thirteen years.</p>
+        <p class="sub">This is the single clearest demonstration on the page of why one season cannot produce a rule.</p>
+      </div>
+    </div>
+  </div>
+</section>
 <section id="slot">
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">A trap worth naming</p>
-      <h2>Draft slot mattered enormously &mdash; and tells you nothing</h2>
+      <p class="eyebrow">A correction</p>
+      <h2>Draft slot: the one place five seasons changed our answer</h2>
+      <p>The single-season version of this page said draft slot produced a big effect that meant nothing. With five seasons, half of that is still right and half of it is not.</p>
+    </div>
+    <div class="wide">
+      <figure>
+        <div class="fh">
+          <h3>Championship rate by draft slot, every season</h3>
+          <p>Fair share in a 12-team league is 8.33%. Blue is above it, orange below.</p>
+        </div>
+        <div class="tablewrap" style="border-top:none">
+          <table>
+            <thead><tr><th>Slot</th><th>2018</th><th>2019</th><th>2023</th><th>2024</th><th>2025</th><th>Average</th></tr></thead>
+            <tbody>
+<tr><td><strong>1</strong></td><td class="lo">6.72</td><td class="lo">8.20</td><td class="hi">10.50</td><td class="lo">2.64</td><td class="lo">7.94</td><td class="lo">7.20</td></tr>
+<tr><td><strong>2</strong></td><td class="lo">6.72</td><td class="hi">9.44</td><td class="lo">8.02</td><td class="lo">3.10</td><td class="hi">9.20</td><td class="lo">7.30</td></tr>
+<tr><td><strong>3</strong></td><td class="lo">6.24</td><td class="hi">11.06</td><td class="lo">7.54</td><td class="lo">4.32</td><td class="hi">8.84</td><td class="lo">7.60</td></tr>
+<tr><td><strong>4</strong></td><td class="lo">7.02</td><td class="hi">10.92</td><td class="lo">7.08</td><td class="lo">6.02</td><td class="lo">6.14</td><td class="lo">7.44</td></tr>
+<tr><td><strong>5</strong></td><td class="lo">7.82</td><td class="lo">7.56</td><td class="lo">6.96</td><td class="lo">8.04</td><td class="lo">5.70</td><td class="lo">7.22</td></tr>
+<tr><td><strong>6</strong></td><td class="hi">8.88</td><td class="lo">4.94</td><td class="lo">5.42</td><td class="hi">9.10</td><td class="lo">5.38</td><td class="lo">6.74</td></tr>
+<tr><td><strong>7</strong></td><td class="hi">9.74</td><td class="lo">4.70</td><td class="lo">5.96</td><td class="hi">9.60</td><td class="lo">8.02</td><td class="lo">7.60</td></tr>
+<tr><td><strong>8</strong></td><td class="hi">9.92</td><td class="lo">5.52</td><td class="lo">6.32</td><td class="hi">11.04</td><td class="hi">8.58</td><td class="lo">8.28</td></tr>
+<tr><td><strong>9</strong></td><td class="hi">9.24</td><td class="lo">6.76</td><td class="lo">7.88</td><td class="hi">11.72</td><td class="hi">8.92</td><td class="hi">8.90</td></tr>
+<tr><td><strong>10</strong></td><td class="hi">8.86</td><td class="hi">8.78</td><td class="hi">9.24</td><td class="hi">10.90</td><td class="hi">10.60</td><td class="hi">9.68</td></tr>
+<tr><td><strong>11</strong></td><td class="hi">9.50</td><td class="hi">11.18</td><td class="hi">12.14</td><td class="hi">11.58</td><td class="hi">10.98</td><td class="hi">11.08</td></tr>
+<tr><td><strong>12</strong></td><td class="hi">9.34</td><td class="hi">10.94</td><td class="hi">12.94</td><td class="hi">11.94</td><td class="hi">9.70</td><td class="hi">10.97</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figcaption>Slots 11 and 12 finish above fair share in all five seasons &mdash; ten results out of ten. Slot 1 ranges from 2.64% to 10.50%.</figcaption>
+      </figure>
     </div>
     <div class="col">
-      <p>Teams picking 9th through 12th won <span class="num">10.34%</span> of titles. Teams picking 5th through 8th won <span class="num">6.62%</span>. That gap is far too large to be noise, and it is completely useless as advice.</p>
-      <p>Here is why. Every one of these 5,000 leagues replays the <em>same</em> 2025 season &mdash; the same players get hurt in the same weeks. In 2025, picks 5 through 8 were Justin Jefferson, Jahmyr Gibbs and Malik Nabers. Once the fantasy playoffs arrived, those three scored at <span class="num">0.76</span>, <span class="num">0.59</span> and <span class="num">0.00</span> times their own earlier pace. Nabers had torn his ACL.</p>
-      <p>We checked that this was the season and not the format: measured on draft day, expected value is flat across all twelve slots, varying by <span class="num">1.9%</span>. The snake is fair. 2025 simply wasn&rsquo;t.</p>
+      <p><strong>Still right:</strong> any individual season&rsquo;s slot pattern is mostly that season. 2024 punished the front of the draft brutally (slot 1 won 2.6% of titles) because Christian McCaffrey was the first pick and missed nine games. In 2023 slot 1 was among the best. You cannot read one year&rsquo;s slot table and learn anything.</p>
+      <p><strong>Now wrong:</strong> the claim that slot tells you nothing at all. Averaged over five seasons the back of the snake beats the front by about three and a half percentage points of title rate, and <em>the middle is consistently the worst place to sit</em> &mdash; slot 6 averages 6.74%. The ends of a snake draft get their picks in pairs; the middle never does.</p>
+      <p>We checked that this is not a bug in how teams are assigned: personas and manager types are distributed evenly across all twelve slots to within sampling noise.</p>
+      <p><strong>What we have not established is why.</strong> The effect is clear in championships but does not track scoring consistently &mdash; the back of the draft outscores the front in three of five seasons and loses in two. A mechanism that only sometimes moves points but always moves titles is not a mechanism we understand yet. Five seasons is enough to notice this; it is not enough to explain it, and we are not going to pretend otherwise.</p>
       <div class="pull">
-        <p class="big">A large, confidently-measured effect that will never repeat.</p>
-        <p class="sub">This is the clearest illustration on the page of why a single season &mdash; even one played 5,000 times &mdash; cannot tell you what to do next year.</p>
+        <p class="big">If your league lets you pick a slot, the back of the snake is the better bet. Everything else about slot is noise.</p>
+        <p class="sub">And you almost certainly cannot pick.</p>
       </div>
     </div>
   </div>
 </section>
-
-<section id="matters">
-  <div class="wrap">
-    <div class="sec-head">
-      <p class="eyebrow">The honest part</p>
-      <h2>How much of this actually matters?</h2>
-    </div>
-    <div class="col">
-      <p>Put draft persona, quarterback timing and manager effort together and they account for about <strong>10% of the variation in how much a team scores</strong>. The other 90% is which players got hurt, which unknowns broke out, and who you drew each week.</p>
-      <p>We tested what that ceiling means in practice. Rank twelve teams by strategy alone, then compare that ranking to how they really finished. Across thousands of leagues the agreement averages <span class="num">0.21</span> on a scale where 1 is perfect and 0 is random &mdash; and it swings by <span class="num">&plusmn;0.29</span>, so a completely backwards prediction is a normal outcome.</p>
-      <div class="def">
-        <h3>What that means for your league</h3>
-        <p>Everything on this page is real: the differences held up across 5,000 leagues, two different waiver systems and three different mixes of opponents. But they are small compared to one year of football. A manager following every recommendation here will still lose most seasons, and the manager who ignores all of it will sometimes win. <strong>The advice shifts the odds; it does not decide the season.</strong></p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section id="how">
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Method</p>
+      <p class="eyebrow">Under the hood</p>
       <h2>How the simulation works</h2>
-      <p>Every league is a complete season played from the draft to the final, using the real 2025 numbers.</p>
+      <p>Each of the five seasons is replayed five thousand times. Players score exactly what they really scored, week by week. Everything else &mdash; who drafted them, who started them, who picked them up &mdash; is simulated.</p>
+    </div>
+    <div class="wide">
+      <ol class="steps">
+        <li><strong>Build the season.</strong> Real weekly box scores are re-scored under ESPN PPR rules, including kickers by distance and defences by points allowed. Preseason projections and average draft position come from what was actually published that August.</li>
+        <li><strong>Draft.</strong> Twelve managers run a 16-round snake from a randomised draft order. Each follows a playbook as a tendency: it nudges close calls, and clear value overrides it.</li>
+        <li><strong>Play the season.</strong> Every week: waiver claims in priority order, free-agent pickups, injured-reserve moves, then lineups set from what was knowable that Wednesday. Head-to-head against a randomised schedule.</li>
+        <li><strong>Playoffs.</strong> Six teams, seeded, through to a final &mdash; in the right weeks for that year&rsquo;s NFL calendar, which is not the same before and after 2021.</li>
+        <li><strong>Repeat, then compare.</strong> For causal questions we replay identical leagues and change exactly one thing, so the difference cannot be luck.</li>
+      </ol>
     </div>
     <div class="col">
-      <ol class="steps">
-        <li><strong>Draft.</strong> Sixteen rounds, snake order, random slots. Each manager reads the board through his own noise, so nobody has the same rankings. Draft costs come from Fantasy Football Calculator&rsquo;s record of 8,470 real mock drafts.</li>
-        <li><strong>Play the weeks.</strong> Scoring, weekly projections and player availability are ESPN&rsquo;s own, cross-checked against official injury reports and NFL rosters.</li>
-        <li><strong>Work the wire.</strong> Every week, managers value their squad, set lineups, stash the injured and submit waiver claims under ESPN&rsquo;s real priority rules. They judge a move by whether the <em>roster</em> improves, not by comparing two players in isolation &mdash; which is why they keep handcuffs and bench depth.</li>
-        <li><strong>Finish the season.</strong> Fourteen head-to-head weeks, then a six-team playoff with byes for the top two seeds.</li>
-      </ol>
-      <h3 style="margin-top:26px">Nothing knows the future</h3>
-      <p>The hardest part was keeping hindsight out. Projection sources quietly blank out a player&rsquo;s week once he is known to have missed it &mdash; <strong>including the week he got hurt mid-game</strong>. Joe Burrow&rsquo;s week 2 arrived showing a projection of zero and seven points actually scored. Left alone, that hands every simulated manager a warning nobody had on the Sunday morning. Those weeks are repaired; a manager only knows a player is out when the official injury report or the roster said so before kickoff.</p>
-      <h3 style="margin-top:26px">Checks it had to pass</h3>
-      <ul class="plain">
-        <li>Simulated draft positions match real mock-draft data at <span class="num">r&nbsp;=&nbsp;0.93</span>, within about 5 picks across the top 100.</li>
-        <li><span class="num">20.4</span> quarterbacks drafted per league, matching real 12-team behaviour.</li>
-        <li>Teams score <span class="num">112</span> points a week, which is what an ESPN PPR league looks like.</li>
-        <li>2025&rsquo;s busts get dropped (Joe Mixon 99% of the time) and its breakouts get picked up.</li>
-      </ul>
+      <h3>The rule that makes it worth anything</h3>
+      <p><strong>No manager ever sees the future.</strong> The hardest part of building this was not the simulation &mdash; it was stopping hindsight leaking in. Projection files, for example, quietly zero out a player&rsquo;s weekly projection for games he ended up missing, <em>including the week he got hurt mid-game</em>. Left alone, that hands every simulated manager a perfect injury forecast. Finding and repairing leaks like that is most of what the code does.</p>
+      <p>A manager who is injured mid-week still starts. A breakout is only visible after it has happened. A player on a bye is on a bye.</p>
     </div>
   </div>
 </section>
@@ -444,27 +580,31 @@
 <section style="border-bottom:none">
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Caveats</p>
+      <p class="eyebrow">The honest part</p>
       <h2>What this can&rsquo;t tell you</h2>
     </div>
     <div class="col">
       <ul class="plain">
-        <li><strong>It is one season, played many times.</strong> The variety is in drafts, schedules and waiver runs &mdash; not in football. A strategy that looks good here may only be good at 2025. Running 2023 and 2024 is what separates a real edge from one year&rsquo;s luck.</li>
-        <li><strong>The managers are model managers.</strong> They don&rsquo;t trade, don&rsquo;t read beat reports and don&rsquo;t tilt. Their disagreements are statistical noise rather than genuinely different opinions about football.</li>
-        <li><strong>Championship rates are noisy by nature.</strong> One champion per league means even 5,000 seasons gives only a few hundred titles per strategy. Season points and playoff rate are measured far better &mdash; prefer them when ranking.</li>
-        <li><strong>The mix of opponents is an assumption</strong>, built from published 2025 draft advice rather than observed from real leagues. Every finding here was re-run against different mixes; anything that moved between them was dropped.</li>
+        <li><strong>Five seasons is not many.</strong> Every &ldquo;average across seasons&rdquo; on this page rests on five numbers. That is why almost all of the intervals in the main table cross zero, and why we have reported that rather than picking a winner.</li>
+        <li><strong>Strategy explains about 10% of the variance.</strong> Playbook, quarterback timing and manager effort together account for roughly a tenth of how much a team scores. The other 90% is which players got hurt, which unknowns broke out, and who you drew each week. Rank twelve teams by strategy alone and the agreement with how they actually finish averages 0.21 &mdash; swinging by &plusmn;0.29, so a completely backwards prediction is a normal outcome.</li>
+        <li><strong>This is one league format.</strong> 12-team, full PPR, one quarterback, ESPN scoring and roster slots. Superflex, half-PPR and deeper benches will behave differently, and the quarterback conclusions especially would not survive a second starting quarterback.</li>
+        <li><strong>The playbook mix is an assumption.</strong> How common each strategy is was set from published draft advice, not from any real league. Every finding was re-tested against different mixes, but the field you actually play in is not this field.</li>
+        <li><strong>2021 and 2022 are missing</strong>, and 2020 is excluded deliberately. Before 2018 no weekly projection data exists anywhere we could find, which sets a hard floor on how far back the simulation can go.</li>
       </ul>
+      <div class="pull">
+        <p class="big">The advice shifts the odds. It does not decide the season.</p>
+        <p class="sub">A manager who follows everything here will still lose most years, and the one who ignores all of it will sometimes win. That is fantasy football, and it is most of the reason people play.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <p>5,000 simulated leagues &middot; 60,000 team-seasons &middot; 244,800 including the counterfactual and sensitivity runs. Every figure is reproducible from a single random seed.</p>
-    <p>Player data from ESPN and Fantasy Football Calculator; injuries, rosters and schedules from nflverse.</p>
+    <p>Simulated with real 2018&ndash;2025 scoring, ESPN projections and Fantasy Football Calculator draft data. 25,000 leagues, 300,000 team-seasons.</p>
+    <p>Method, code and the full written report are in the <a href="https://github.com/lewisweed/Fantasy-Football">project repository</a>.</p>
   </div>
 </footer>
-
 <script>
 (function(){
   "use strict";
@@ -472,198 +612,72 @@
   function el(n,a){var e=document.createElementNS(NS,n);for(var k in a){if(a[k]!==null&&a[k]!==undefined)e.setAttribute(k,a[k]);}return e;}
   function txt(e,s){e.appendChild(document.createTextNode(s));return e;}
   function tip(g,s){var t=document.createElementNS(NS,"title");t.textContent=s;g.appendChild(t);}
-  function svg(host,w,h){
-    var s=el("svg",{viewBox:"0 0 "+w+" "+h,role:"img","aria-hidden":"false"});
-    host.appendChild(s);return s;
-  }
+  function svg(host,w,h){var s=el("svg",{viewBox:"0 0 "+w+" "+h,role:"img","aria-hidden":"false"});host.appendChild(s);return s;}
   var INK="var(--ink)",MUT="var(--muted)",HAIR="var(--hair)",ACC="var(--accent)",WARM="var(--warm)";
   var MONO='"IBM Plex Mono",monospace';
+  var YEARS=[2018,2019,2023,2024,2025];
 
-  var PERSONA=[
-    ["Elite TE",10.74,9.89,11.66,53.91,1586],
-    ["QB streamer",10.30,9.17,11.56,51.19,1576],
-    ["Robust RB",10.13,9.42,10.88,56.39,1595],
-    ["Late QB",9.17,8.57,9.80,50.68,1577],
-    ["Balanced",8.40,7.94,8.89,50.11,1573],
-    ["Hero RB",8.17,7.54,8.85,50.64,1578],
-    ["Backup-QB hoarder",7.87,6.97,8.87,49.81,1572],
-    ["Elite TE + early QB",7.53,6.54,8.65,48.15,1564],
-    ["Early QB",6.85,6.21,7.56,47.03,1561],
-    ["Elite QB only",6.22,5.40,7.14,45.64,1559],
-    ["Zero RB",4.08,3.52,4.74,39.94,1533]
+  var SLOPE=[
+    {n:"Zero RB",z:[1.79,-3.06,0.03,-2.12,-2.44],c:WARM,w:2.4},
+    {n:"Robust RB",z:[-1.66,0.38,-2.26,1.49,1.60],c:ACC,w:2.4},
+    {n:"Hero RB",z:[1.87,-0.14,-0.10,-1.44,0.48]},
+    {n:"Elite QB only",z:[-0.84,0.22,1.31,0.80,-0.69]},
+    {n:"Early QB",z:[-0.67,0.08,1.09,0.67,-0.56]},
+    {n:"QB streamer",z:[0.23,0.32,-1.27,0.15,0.35]},
+    {n:"Elite TE + early QB",z:[-0.54,-0.03,0.96,-0.59,-0.45]},
+    {n:"Elite TE",z:[0.14,0.44,0.57,-0.33,0.95]},
+    {n:"Late QB",z:[0.01,0.78,-0.29,0.29,0.42]},
+    {n:"Balanced",z:[-0.12,0.41,0.10,0.55,0.25]},
+    {n:"Backup-QB hoarder",z:[-0.20,0.60,-0.14,0.52,0.09]}
   ];
-  var CF=[[2,-18.1,-23.5,-12.7],[3,-11.8,-16.2,-7.4],[4,8.5,3.7,13.3],[5,16.6,11.8,21.5],
-    [6,9.4,4.5,14.2],[7,4.7,0.0,9.4],[8,7.4,2.9,12.0],[9,6.2,1.7,10.8],
-    [10,7.5,2.9,12.1],[11,7.6,3.1,12.2],[12,8.8,4.2,13.3]];
-  var QBS=[
-    ["Lamar Jackson",2.4,4.26,17.1],["Josh Allen",2.6,7.28,21.9],["Joe Burrow",3.0,6.32,16.3],
-    ["Jayden Daniels",3.1,6.73,17.0],["Jalen Hurts",3.6,6.65,18.7],["Patrick Mahomes",5.1,9.75,19.5],
-    ["Baker Mayfield",5.5,9.31,17.2],["Bo Nix",7.0,10.42,17.7],["Brock Purdy",7.9,10.97,17.4],
-    ["Dak Prescott",8.3,10.31,17.7],["Kyler Murray",8.6,8.02,16.9],["Jared Goff",9.5,9.92,17.5],
-    ["Caleb Williams",10.4,9.88,18.3],["Justin Herbert",10.8,10.58,18.1],["J.J. McCarthy",11.0,9.29,17.0],
-    ["Justin Fields",11.1,10.02,17.1],["Drake Maye",11.3,13.25,19.3]
+  var EFFORT=[
+    {n:"Active",v:[9.31,9.59,9.44,9.36,9.78],c:ACC},
+    {n:"Moderate",v:[7.56,7.33,7.46,7.70,7.17],c:MUT},
+    {n:"Lazy",v:[5.64,4.89,5.24,4.84,4.38],c:WARM}
   ];
-  var ACT=[["Active",9.45,9.14,9.77,55.70,1597,17.6],
-           ["Moderate",7.64,7.28,8.01,46.03,1558,9.2],
-           ["Lazy",4.61,4.11,5.17,32.32,1493,4.0]];
-  var FAIR=8.333;
 
-  /* ---- horizontal interval chart ---- */
-  function rangeChart(id,rows,opts){
+  function lineChart(id,series,opts){
     var host=document.getElementById(id); if(!host)return;
-    var L=opts.gutter, R=22, T=26, rowH=opts.rowH||26, W=720;
-    var H=T+rows.length*rowH+30;
+    var W=720,L=44,R=opts.labelRoom||128,T=18,B=30;
+    var H=opts.height||320;
     var s=svg(host,W,H);
-    var lo=opts.min, hi=opts.max, span=hi-lo;
-    function x(v){return L+(v-lo)/span*(W-L-R);}
-    for(var t=Math.ceil(lo/opts.step)*opts.step;t<=hi+1e-9;t+=opts.step){
-      s.appendChild(el("line",{x1:x(t).toFixed(1),x2:x(t).toFixed(1),y1:T-8,y2:T+rows.length*rowH-4,
-        stroke:HAIR,"stroke-width":1}));
-      s.appendChild(txt(el("text",{x:x(t).toFixed(1),y:T+rows.length*rowH+14,"text-anchor":"middle",
-        fill:MUT,"font-size":10,"font-family":MONO}),opts.fmt(t)));
+    var lo=opts.min,hi=opts.max;
+    function x(i){return L+i/(YEARS.length-1)*(W-L-R);}
+    function y(v){return T+(hi-v)/(hi-lo)*(H-T-B);}
+    for(var t=opts.tickFrom;t<=hi+1e-9;t+=opts.step){
+      var isRef=(opts.refAt!==undefined&&Math.abs(t-opts.refAt)<1e-9);
+      s.appendChild(el("line",{x1:L,x2:W-R,y1:y(t).toFixed(1),y2:y(t).toFixed(1),
+        stroke:isRef?INK:HAIR,"stroke-width":isRef?1.3:1,"stroke-dasharray":isRef?"4 3":null}));
+      s.appendChild(txt(el("text",{x:L-8,y:(y(t)+3.5).toFixed(1),"text-anchor":"end",fill:isRef?INK:MUT,
+        "font-size":10,"font-family":MONO}),opts.fmt(t)));
     }
-    if(opts.refAt!==undefined){
-      s.appendChild(el("line",{x1:x(opts.refAt).toFixed(1),x2:x(opts.refAt).toFixed(1),y1:T-14,
-        y2:T+rows.length*rowH-4,stroke:INK,"stroke-width":1.5,"stroke-dasharray":"3 3"}));
-      s.appendChild(txt(el("text",{x:x(opts.refAt).toFixed(1),y:T-19,"text-anchor":"middle",fill:INK,
-        "font-size":10,"font-weight":600,"font-family":MONO}),opts.refLabel));
-    }
-    rows.forEach(function(r,i){
-      var cy=T+i*rowH+rowH/2-2, c=opts.color(r);
-      var g=el("g",{class:"mark"});
-      tip(g,r[0]+": "+opts.fmt(r[1])+"  (95% CI "+opts.fmt(r[2])+" to "+opts.fmt(r[3])+")");
-      g.appendChild(el("rect",{x:x(r[2]).toFixed(1),y:cy-4,width:Math.max(2,x(r[3])-x(r[2])).toFixed(1),
-        height:8,rx:4,fill:c,"fill-opacity":.28}));
-      g.appendChild(el("line",{x1:x(r[2]).toFixed(1),x2:x(r[3]).toFixed(1),y1:cy,y2:cy,stroke:c,"stroke-width":2}));
-      g.appendChild(el("circle",{cx:x(r[1]).toFixed(1),cy:cy,r:5,fill:c,stroke:"var(--surface)","stroke-width":2}));
-      g.appendChild(txt(el("text",{x:L-10,y:cy+4,"text-anchor":"end",fill:INK,"font-size":12,
-        "font-family":'"Source Serif 4",serif'}),r[0]));
-      g.appendChild(txt(el("text",{x:(W-R+4),y:cy+4,"text-anchor":"start",fill:MUT,"font-size":10,
-        "font-family":MONO}),opts.fmt(r[1])));
-      s.appendChild(g);
+    YEARS.forEach(function(yr,i){
+      s.appendChild(txt(el("text",{x:x(i).toFixed(1),y:H-9,"text-anchor":"middle",fill:MUT,
+        "font-size":10.5,"font-family":MONO}),yr));
     });
-  }
-
-  rangeChart("c-persona",PERSONA,{
-    gutter:150,min:3,max:12.5,step:2,refAt:FAIR,refLabel:"fair share 8.33%",
-    fmt:function(v){return v.toFixed(1)+"%";},
-    color:function(r){return r[3]<FAIR?WARM:ACC;}
-  });
-  rangeChart("c-act",ACT,{
-    gutter:92,min:3,max:10.5,step:2,rowH:34,refAt:FAIR,refLabel:"fair share 8.33%",
-    fmt:function(v){return v.toFixed(1)+"%";},
-    color:function(r){return r[3]<FAIR?WARM:ACC;}
-  });
-
-  /* ---- counterfactual: vertical dot-and-interval around zero ---- */
-  (function(){
-    var host=document.getElementById("c-cf"); if(!host)return;
-    var W=720,T=22,B=44,L=46,R=16,H=320;
-    var s=svg(host,W,H);
-    var lo=-26,hi=24,span=hi-lo;
-    function y(v){return T+(hi-v)/span*(H-T-B);}
-    var n=CF.length, colW=(W-L-R)/n;
-    function cx(i){return L+colW*(i+0.5);}
-    for(var t=-25;t<=20;t+=5){
-      s.appendChild(el("line",{x1:L,x2:W-R,y1:y(t).toFixed(1),y2:y(t).toFixed(1),stroke:HAIR,"stroke-width":1}));
-      s.appendChild(txt(el("text",{x:L-8,y:(y(t)+3.5).toFixed(1),"text-anchor":"end",fill:MUT,
-        "font-size":10,"font-family":MONO}),(t>0?"+":"")+t));
-    }
-    s.appendChild(el("line",{x1:L,x2:W-R,y1:y(0).toFixed(1),y2:y(0).toFixed(1),stroke:INK,"stroke-width":1.5}));
-    s.appendChild(txt(el("text",{x:W-R,y:(y(0)-7).toFixed(1),"text-anchor":"end",fill:INK,"font-size":10,
-      "font-weight":600,"font-family":MONO}),"drafting naturally"));
-    s.appendChild(txt(el("text",{x:14,y:H/2-20,fill:MUT,"font-size":10,"font-family":MONO,
-      transform:"rotate(-90 14 "+(H/2-20)+")","text-anchor":"middle"}),"season points"));
-    CF.forEach(function(r,i){
-      var c=r[1]<0?WARM:ACC, X=cx(i);
+    series.forEach(function(d){
+      var vals=d.z||d.v, c=d.c||MUT, w=d.w||1.3, faint=!d.c;
       var g=el("g",{class:"mark"});
-      tip(g,"First QB in round "+r[0]+": "+(r[1]>0?"+":"")+r[1].toFixed(1)+" season points (95% CI "
-        +(r[2]>0?"+":"")+r[2].toFixed(1)+" to "+(r[3]>0?"+":"")+r[3].toFixed(1)+")");
-      g.appendChild(el("rect",{x:(X-4).toFixed(1),y:y(r[3]).toFixed(1),width:8,
-        height:Math.max(2,y(r[2])-y(r[3])).toFixed(1),rx:4,fill:c,"fill-opacity":.28}));
-      g.appendChild(el("line",{x1:X.toFixed(1),x2:X.toFixed(1),y1:y(r[2]).toFixed(1),y2:y(r[3]).toFixed(1),
-        stroke:c,"stroke-width":2}));
-      g.appendChild(el("circle",{cx:X.toFixed(1),cy:y(r[1]).toFixed(1),r:5,fill:c,
-        stroke:"var(--surface)","stroke-width":2}));
-      g.appendChild(txt(el("text",{x:X.toFixed(1),y:H-B+18,"text-anchor":"middle",fill:MUT,"font-size":11,
-        "font-family":MONO}),r[0]));
-      s.appendChild(g);
-    });
-    s.appendChild(txt(el("text",{x:(L+(W-L-R)/2).toFixed(1),y:H-B+34,"text-anchor":"middle",fill:MUT,
-      "font-size":10,"font-family":MONO}),"round the first quarterback was forced into"));
-  })();
-
-  /* ---- QB scatter ---- */
-  (function(){
-    var host=document.getElementById("c-qbs"); if(!host)return;
-    var W=720,H=360,T=22,B=48,L=46,R=100;
-    var s=svg(host,W,H);
-    var xlo=1.5,xhi=12.2,ylo=3.5,yhi=14;
-    function X(v){return L+(v-xlo)/(xhi-xlo)*(W-L-R);}
-    function Y(v){return T+(yhi-v)/(yhi-ylo)*(H-T-B);}
-    for(var t=4;t<=14;t+=2){
-      s.appendChild(el("line",{x1:L,x2:W-R,y1:Y(t).toFixed(1),y2:Y(t).toFixed(1),stroke:HAIR,"stroke-width":1}));
-      s.appendChild(txt(el("text",{x:L-8,y:(Y(t)+3.5).toFixed(1),"text-anchor":"end",fill:MUT,"font-size":10,
-        "font-family":MONO}),t+"%"));
-    }
-    for(var r2=2;r2<=12;r2+=2){
-      s.appendChild(txt(el("text",{x:X(r2).toFixed(1),y:H-B+18,"text-anchor":"middle",fill:MUT,"font-size":10,
-        "font-family":MONO}),"R"+r2));
-    }
-    s.appendChild(el("line",{x1:L,x2:W-R,y1:Y(FAIR).toFixed(1),y2:Y(FAIR).toFixed(1),stroke:INK,
-      "stroke-width":1.5,"stroke-dasharray":"3 3"}));
-    s.appendChild(txt(el("text",{x:W-R+6,y:(Y(FAIR)+3.5).toFixed(1),"text-anchor":"start",fill:INK,
-      "font-size":10,"font-weight":600,"font-family":MONO}),"fair share"));
-    s.appendChild(txt(el("text",{x:(L+(W-L-R)/2).toFixed(1),y:H-B+34,"text-anchor":"middle",fill:MUT,
-      "font-size":10,"font-family":MONO}),"average round he was drafted  →  cheaper"));
-    s.appendChild(txt(el("text",{x:14,y:H/2-24,fill:MUT,"font-size":10,"font-family":MONO,
-      transform:"rotate(-90 14 "+(H/2-24)+")","text-anchor":"middle"}),"championship rate"));
-    var NAMED={"Josh Allen":[9,-9],"Lamar Jackson":[9,4],"Drake Maye":[-9,-9],"Patrick Mahomes":[-9,-8],
-      "Brock Purdy":[0,-12],"Joe Burrow":[-9,5]};
-    QBS.forEach(function(q){
-      var c=q[2]<FAIR?WARM:ACC;
-      var g=el("g",{class:"mark"});
-      tip(g,q[0]+" — drafted round "+q[1].toFixed(1)+", "+q[2].toFixed(2)+"% titles, "+q[3].toFixed(1)+" pts/game");
-      g.appendChild(el("circle",{cx:X(q[1]).toFixed(1),cy:Y(q[2]).toFixed(1),r:5.5,fill:c,
-        stroke:"var(--surface)","stroke-width":2}));
-      var off=NAMED[q[0]];
-      if(off){
-        g.appendChild(txt(el("text",{x:(X(q[1])+off[0]).toFixed(1),y:(Y(q[2])+off[1]).toFixed(1),
-          "text-anchor":off[0]<0?"end":(off[0]===0?"middle":"start"),fill:INK,"font-size":11,
-          "font-family":'"Source Serif 4",serif'}),q[0]));
-      }
-      s.appendChild(g);
-    });
-  })();
-
-  /* ---- tables ---- */
-  function fill(id,rows,cells){
-    var tb=document.querySelector("#"+id+" tbody"); if(!tb)return;
-    rows.forEach(function(r){
-      var tr=document.createElement("tr");
-      cells(r).forEach(function(c){
-        var td=document.createElement("td");
-        if(typeof c==="object"){td.textContent=c.v; if(c.cls)td.className=c.cls;}
-        else td.textContent=c;
-        tr.appendChild(td);
+      var pts=vals.map(function(v,i){return x(i).toFixed(1)+","+y(v).toFixed(1);}).join(" ");
+      g.appendChild(el("polyline",{points:pts,fill:"none",stroke:c,"stroke-width":w,
+        "stroke-opacity":faint?0.42:1,"stroke-linejoin":"round","stroke-linecap":"round"}));
+      vals.forEach(function(v,i){
+        g.appendChild(el("circle",{cx:x(i).toFixed(1),cy:y(v).toFixed(1),r:faint?2:3.1,fill:c,
+          "fill-opacity":faint?0.42:1}));
       });
-      tb.appendChild(tr);
+      var last=vals[vals.length-1];
+      g.appendChild(txt(el("text",{x:(W-R+8).toFixed(1),y:(y(last)+3.5).toFixed(1),fill:faint?MUT:c,
+        "font-size":10.5,"font-weight":faint?400:600,
+        "font-family":'"Bricolage Grotesque",sans-serif'}),d.n));
+      tip(g,d.n+": "+YEARS.map(function(yr,i){return yr+" "+opts.fmt(vals[i]);}).join(", "));
+      s.appendChild(g);
     });
   }
-  fill("t-persona",PERSONA,function(r){
-    return [r[0],
-      {v:r[1].toFixed(2)+"%",cls:r[2]>FAIR?"hi":(r[3]<FAIR?"lo":"")},
-      r[2].toFixed(2)+"–"+r[3].toFixed(2)+"%",
-      (r[1]/ (100/12)).toFixed(2)+"×",
-      r[4].toFixed(1)+"%", Math.round(r[5])];
-  });
-  fill("t-act",ACT,function(r){
-    return [r[0],{v:r[1].toFixed(2)+"%",cls:r[2]>FAIR?"hi":(r[3]<FAIR?"lo":"")},
-      r[2].toFixed(2)+"–"+r[3].toFixed(2)+"%",r[4].toFixed(1)+"%",Math.round(r[5]),r[6].toFixed(1)];
-  });
-  fill("t-qbs",QBS.slice().sort(function(a,b){return b[2]-a[2];}),function(r){
-    return [r[0],r[1].toFixed(1),{v:r[2].toFixed(2)+"%",cls:r[2]>FAIR?"hi":"lo"},r[3].toFixed(1)];
-  });
+
+  lineChart("slope",SLOPE,{min:-3.3,max:2.1,tickFrom:-3,step:1,refAt:0,height:340,
+    fmt:function(v){return (v>0?"+":"")+v.toFixed(0);}});
+  lineChart("effortplot",EFFORT,{min:3.5,max:10.5,tickFrom:4,step:2,refAt:8.333,height:250,
+    labelRoom:96,fmt:function(v){return v.toFixed(v===8.333?1:0)+"%";}});
 })();
 </script>
 </body>
