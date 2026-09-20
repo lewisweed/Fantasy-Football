@@ -1,7 +1,14 @@
-# Five seasons of simulated fantasy football
+# Seven seasons of simulated fantasy football
 
-2018, 2019, 2023, 2024 and 2025, each played 5,000 times: 300,000 simulated
-leagues and 3.6 million team-seasons. 2020 is excluded (no preseason, opt-outs,
+2018, 2019, 2021, 2022, 2023, 2024 and 2025, each played 5,000 times: 35,000
+simulated leagues and 420,000 team-seasons.
+
+2021 and 2022 are built from nflverse box scores plus FantasyPros consensus
+rather than ESPN projections, because the ESPN files for those years were never
+obtainable here. That source difference was tested rather than assumed: 2024 was
+rebuilt with its ESPN file hidden and re-simulated, and the two tiers agree on
+the strategy ranking at **+0.982** -- closer than a season agrees with itself.
+Section 11 gives the check. 2020 is excluded (no preseason, opt-outs,
 COVID-list absences) and 2012 (the ADP source returned only eight rounds).
 
 Every number below comes from managers who could only see what was knowable at
@@ -17,23 +24,23 @@ deviations its teams' scoring rate sat above or below the league average that
 season. Zero is average; +1.0 is a full standard deviation better than the
 field.
 
-| strategy | 2018 | 2019 | 2023 | 2024 | 2025 | mean | sd | 95% CI |
-|---|---|---|---|---|---|---|---|---|
-| elite_te | 0.14 | 0.44 | 0.57 | -0.33 | 0.95 | 0.35 | 0.48 | -0.24 to +0.95 |
-| late_qb | 0.01 | 0.78 | -0.29 | 0.29 | 0.42 | 0.24 | 0.41 | -0.26 to +0.75 |
-| balanced | -0.12 | 0.41 | 0.1 | 0.55 | 0.25 | 0.24 | 0.26 | -0.09 to +0.56 |
-| backup_qb_hoard | -0.2 | 0.6 | -0.14 | 0.52 | 0.09 | 0.17 | 0.37 | -0.28 to +0.63 |
-| elite_qb_only | -0.84 | 0.22 | 1.31 | 0.8 | -0.69 | 0.16 | 0.93 | -0.99 to +1.32 |
-| hero_rb | 1.87 | -0.14 | -0.1 | -1.44 | 0.48 | 0.13 | 1.2 | -1.35 to +1.62 |
-| early_qb | -0.67 | 0.08 | 1.09 | 0.67 | -0.56 | 0.12 | 0.76 | -0.83 to +1.07 |
-| qb_streamer | 0.23 | 0.32 | -1.27 | 0.15 | 0.35 | -0.04 | 0.69 | -0.90 to +0.81 |
-| robust_rb | -1.66 | 0.38 | -2.26 | 1.49 | 1.6 | -0.09 | 1.78 | -2.31 to +2.12 |
-| elite_te_early_qb | -0.54 | -0.03 | 0.96 | -0.59 | -0.45 | -0.13 | 0.65 | -0.94 to +0.68 |
-| zero_rb | 1.79 | -3.06 | 0.03 | -2.12 | -2.44 | -1.16 | 2.02 | -3.66 to +1.34 |
+| strategy | 2018 | 2019 | 2021 | 2022 | 2023 | 2024 | 2025 | mean | 95% CI |
+|---|---|---|---|---|---|---|---|---|---|
+| elite_qb_only | -0.84 | 0.22 | 0.81 | 0.38 | 1.31 | 0.8 | -0.69 | 0.29 | -0.45 to +1.02 |
+| elite_te | 0.14 | 0.44 | -0.23 | 0.08 | 0.57 | -0.33 | 0.95 | 0.23 | -0.19 to +0.65 |
+| late_qb | 0.01 | 0.78 | 1.06 | -0.73 | -0.29 | 0.29 | 0.42 | 0.22 | -0.35 to +0.79 |
+| backup_qb_hoard | -0.2 | 0.6 | -0.08 | 0.38 | -0.14 | 0.52 | 0.09 | 0.17 | -0.14 to +0.47 |
+| balanced | -0.12 | 0.41 | 0.11 | -0.24 | 0.1 | 0.55 | 0.25 | 0.15 | -0.11 to +0.41 |
+| early_qb | -0.67 | 0.08 | -0.64 | 0.99 | 1.09 | 0.67 | -0.56 | 0.14 | -0.58 to +0.86 |
+| hero_rb | 1.87 | -0.14 | -0.14 | -0.1 | -0.1 | -1.44 | 0.48 | 0.06 | -0.85 to +0.97 |
+| qb_streamer | 0.23 | 0.32 | 2.1 | -1.85 | -1.27 | 0.15 | 0.35 | 0.0 | -1.18 to +1.18 |
+| elite_te_early_qb | -0.54 | -0.03 | -1.63 | 1.5 | 0.96 | -0.59 | -0.45 | -0.11 | -1.08 to +0.86 |
+| robust_rb | -1.66 | 0.38 | -0.08 | -1.5 | -2.26 | 1.49 | 1.6 | -0.29 | -1.73 to +1.14 |
+| zero_rb | 1.79 | -3.06 | -1.28 | 1.08 | 0.03 | -2.12 | -2.44 | -0.86 | -2.57 to +0.86 |
 
-Read the last column. **Not one of the eleven strategies has a five-season
+Read the last column. **Not one of the eleven strategies has a seven-season
 average that can be distinguished from zero.** Even Zero RB, which is worst by
-a distance, has an interval spanning +1.34 — because in 2018 it was the single
+a distance, has an interval spanning +0.86 — because in 2018 it was the single
 best strategy on the board.
 
 This is not a failure to find a signal. It is the finding. The per-season
@@ -47,30 +54,39 @@ If strategy rankings were stable, the order in one season would predict the
 order in another. Rank correlation runs from +1 (identical) through 0 (no
 relationship) to −1 (exactly reversed).
 
-| season | 2018 | 2019 | 2023 | 2024 | 2025 |
-|---|---|---|---|---|---|
-| 2018 | 1.0 | -0.2 | -0.25 | -0.84 | 0.12 |
-| 2019 | -0.2 | 1.0 | -0.35 | 0.43 | 0.47 |
-| 2023 | -0.25 | -0.35 | 1.0 | 0.02 | -0.6 |
-| 2024 | -0.84 | 0.43 | 0.02 | 1.0 | 0.08 |
-| 2025 | 0.12 | 0.47 | -0.6 | 0.08 | 1.0 |
+| season | 2018 | 2019 | 2021 | 2022 | 2023 | 2024 | 2025 |
+|---|---|---|---|---|---|---|---|
+| 2018 | 1.0 | -0.2 | 0.0 | -0.14 | -0.25 | -0.84 | 0.12 |
+| 2019 | -0.2 | 1.0 | 0.58 | -0.53 | -0.35 | 0.43 | 0.47 |
+| 2021 | 0.0 | 0.58 | 1.0 | -0.75 | -0.43 | 0.42 | 0.25 |
+| 2022 | -0.14 | -0.53 | -0.75 | 1.0 | 0.75 | -0.29 | -0.75 |
+| 2023 | -0.25 | -0.35 | -0.43 | 0.75 | 1.0 | 0.02 | -0.6 |
+| 2024 | -0.84 | 0.43 | 0.42 | -0.29 | 0.02 | 1.0 | 0.08 |
+| 2025 | 0.12 | 0.47 | 0.25 | -0.75 | -0.6 | 0.08 | 1.0 |
 
 mean off-diagonal -0.111, range -0.84 to +0.47
 
-The mean is **−0.11**: slightly worse than useless. 2018 and 2024 sit at
-**−0.84**, close to a perfect reversal.
+The mean across all 21 pairs is **−0.094**: slightly worse than useless. 2018
+and 2024 sit at **−0.84**, close to a perfect reversal.
+
+The two seasons added last supply the sharpest case in the set, and they are
+consecutive. **QB streamer is the best strategy of 2021 (+2.10) and the worst
+of 2022 (−1.85).** Elite TE + early QB does the reverse across the same two
+years, worst to best. Whatever a manager concluded about quarterbacks from
+2021 was precisely wrong for 2022.
 
 Two controls make this interpretable:
 
 - **Random baseline.** Shuffling eleven strategies gives 0.00 ± 0.32. The
-  observed −0.11 is comfortably inside that band; there is no cross-season
+  observed −0.094 is comfortably inside that band; there is no cross-season
   signal at all.
 - **Reliability ceiling.** Split each season's leagues into two halves and rank
-  strategies in each independently. Agreement is **+0.93**. So the measurement
+  strategies in each independently. Agreement averages **+0.92** across the
+  seven seasons, from +0.80 in 2021 to +0.98 in 2018. So the measurement
   is nearly perfect — a season's ranking reproduces itself almost exactly. The
   ranking is real, precise, and specific to that season.
 
-A ceiling of +0.93 against an observed +(−0.11) is about as cleanly as this
+A ceiling of +0.92 against an observed −0.094 is about as cleanly as this
 question can be settled. **Strategy rankings do not transfer between seasons.**
 
 ## 3. What decides it
@@ -82,6 +98,8 @@ finished above or below their own preseason projection:
 |---|---|---|---|---|---|
 | 2018 | -18 | -38 | -9 | -15 | -30 |
 | 2019 | -28 | -31 | -32 | -45 | 1 |
+| 2021 | -27 | -34 | -32 | -2 | -1 |
+| 2022 | -10 | -46 | -35 | -47 | -11 |
 | 2023 | -46 | -61 | -30 | -18 | -31 |
 | 2024 | 2 | 0 | -40 | -26 | 41 |
 | 2025 | -88 | -41 | -60 | -41 | 19 |
@@ -94,23 +112,23 @@ receivers, tracks strategy performance closely:
 
 | strategy | r |
 |---|---|
-| zero_rb | -0.757 |
-| hero_rb | -0.689 |
-| elite_te_early_qb | -0.573 |
-| elite_te | -0.273 |
-| early_qb | 0.034 |
-| elite_qb_only | 0.039 |
-| qb_streamer | 0.53 |
-| late_qb | 0.578 |
-| backup_qb_hoard | 0.739 |
-| balanced | 0.865 |
-| robust_rb | 0.949 |
+| robust_rb | 0.934 |
+| balanced | 0.758 |
+| backup_qb_hoard | 0.627 |
+| late_qb | 0.408 |
+| qb_streamer | 0.323 |
+| elite_qb_only | 0.023 |
+| early_qb | -0.044 |
+| elite_te | -0.203 |
+| elite_te_early_qb | -0.386 |
+| hero_rb | -0.662 |
+| zero_rb | -0.736 |
 
-Robust RB correlates **+0.95** with that single number and Zero RB **−0.76**.
+Robust RB correlates **+0.93** with that single number and Zero RB **−0.74**.
 These strategies are not really strategies. They are leveraged bets on one
 quantity, and their season is decided by it.
 
-Balanced sits at +0.87, which is worth naming honestly: a manager who simply
+Balanced sits at +0.76, which is worth naming honestly: a manager who simply
 follows ADP inherits a running-back-heavy early board in this era, and so
 carries much of the same exposure without choosing it.
 
@@ -138,27 +156,30 @@ about to play.**
 
 ## 5. What did work, every single year
 
-| manager | 2018 | 2019 | 2023 | 2024 | 2025 |
-|---|---|---|---|---|---|
-| active | 9.31 | 9.59 | 9.44 | 9.36 | 9.78 |
-| lazy | 5.64 | 4.89 | 5.24 | 4.84 | 4.38 |
-| moderate | 7.56 | 7.33 | 7.46 | 7.7 | 7.17 |
+Championship rate, %:
 
-| manager | 2018 | 2019 | 2023 | 2024 | 2025 |
-|---|---|---|---|---|---|
-| active | 1566 | 1515 | 1625 | 1619 | 1595 |
-| lazy | 1505 | 1436 | 1552 | 1532 | 1490 |
-| moderate | 1546 | 1483 | 1597 | 1586 | 1557 |
+| manager | 2018 | 2019 | 2021 | 2022 | 2023 | 2024 | 2025 |
+|---|---|---|---|---|---|---|---|
+| active | 9.31 | 9.59 | 9.51 | 9.28 | 9.44 | 9.36 | 9.78 |
+| moderate | 7.56 | 7.33 | 7.62 | 7.49 | 7.46 | 7.7 | 7.17 |
+| lazy | 5.64 | 4.89 | 4.31 | 6.04 | 5.24 | 4.84 | 4.38 |
 
-Active managers beat lazy ones in all five seasons, on both measures, without
-exception — 3.7 to 5.4 percentage points of title rate and 61 to 105 points of
-scoring. The ordering active > moderate > lazy holds 15 times out of 15.
+Season points:
+
+| manager | 2018 | 2019 | 2021 | 2022 | 2023 | 2024 | 2025 |
+|---|---|---|---|---|---|---|---|
+| active | 1566 | 1515 | 1615 | 1577 | 1625 | 1619 | 1595 |
+| moderate | 1546 | 1483 | 1582 | 1548 | 1597 | 1586 | 1557 |
+| lazy | 1505 | 1436 | 1526 | 1506 | 1552 | 1532 | 1490 |
+
+Active managers beat lazy ones in all seven seasons, on both measures, without
+exception — 3.2 to 5.4 percentage points of title rate and 61 to 105 points of
+scoring. The ordering active > moderate > lazy holds **21 times out of 21**.
 
 Set that against Section 1, where no draft strategy is distinguishable from
-average over the same five seasons. The contrast is the practical conclusion of
-this entire project: **how you draft is a bet on the season; whether you manage
-the roster afterwards is not.**
-
+average over the same seven seasons. The contrast is the practical conclusion
+of this entire project: **how you draft is a bet on the season; whether you
+manage the roster afterwards is not.**
 
 ---
 
@@ -175,7 +196,8 @@ first round in late August, because holdouts of that length essentially do not
 happen. Behind him the rest of the early running-back board came apart too —
 Devonta Freeman (10 games missed), Dalvin Cook, Leonard Fournette, LeSean
 McCoy. Early running backs finished 38 points below projection while early
-receivers lost only 9, the most RB-hostile board of the five seasons.
+receivers lost only 9 -- the second most RB-hostile board in the set, a
+whisker behind 2023.
 
 **The twist.** The single largest windfall in the entire dataset was James
 Conner, who went at pick 157 and scored 268 points — 215 above projection. He
@@ -313,6 +335,51 @@ How the first five rounds paid off, by position — points versus each player's 
 | JuJu Smith-Schuster | WR | 12.9 | rostered | 15% | 8% | -121 | -8 |
 | Austin Ekeler | RB | 61.7 | avoided | 1% | 8% | +99 | -7 |
 
+
+### 2021
+
+Best strategy **qb_streamer** (+2.10 above the field), worst **elite_te_early_qb** (−1.63).
+
+**What happened.** The best season in the set for refusing to pay at
+quarterback. Taylor Heinicke went undrafted in the average league — ADP 361 —
+and scored 204 points, 115 above projection. Tom Brady, at 38 years older than
+the field's preferred targets, was the QB streamer's single largest gain. The
+premium options were where the damage sat: Kyler Murray and Russell Wilson both
+cost the managers who took them, and the strategy that won did so largely by
+**not owning either.**
+
+**The receivers fell apart.** Calvin Ridley, drafted 13th on average, stepped
+away from the game after five games and finished 190 points short. Allen
+Robinson, Julio Jones and DeAndre Hopkins all missed by more than 118. Meanwhile
+Cordarrelle Patterson — a kick returner being converted to running back at 30,
+ADP 331 — produced 213 points.
+
+**Why the loser lost.** Elite TE + early QB paid twice for premium positions in
+a season that punished both. Darren Waller, its anchor tight end, was its
+largest single loss.
+
+### 2022
+
+Best strategy **elite_te_early_qb** (+1.50), worst **qb_streamer** (−1.85).
+
+**The sharpest inversion in the project, and it is consecutive.** The two
+strategies that finished first and last in 2021 swapped places exactly in 2022.
+A manager who drew the correct lesson from 2021 — *don't pay for a
+quarterback, stream it* — was running the worst strategy on the board twelve
+months later.
+
+**Why.** Travis Kelce delivered the single largest positive contribution of any
+player to any strategy in the dataset (+13 points of edge to Elite TE + early
+QB), and Josh Allen backed him. The streaming approach, meanwhile, was left
+shopping in a quarterback pool that detonated: Matthew Stafford cost it 14
+points of edge, Trey Lance 8, Dak Prescott 8. Cheap quarterbacks were abundant
+in 2021 and radioactive in 2022, and nothing in either August distinguished the
+two.
+
+**Running backs were the worst of any season measured**, at 46 points below
+projection: Javonte Williams and Elijah Mitchell both lost nine games, J.K.
+Dobbins eight. Tight end was equally bad in aggregate (−47) — which is what
+makes Kelce's season the decisive asset it was.
 
 ### 2023
 
@@ -531,69 +598,88 @@ How the first five rounds paid off, by position — points versus each player's 
 ## 7. Effort does not merely beat strategy; it dominates every cell
 
 Title rate for each combination of draft strategy and manager effort, pooled
-over the five seasons:
+over the seven seasons:
 
 | strategy | lazy | moderate | active |
 |---|---|---|---|
-| elite_te | 6.00 | 7.76 | 10.09 |
-| late_qb | 5.91 | 8.15 | 10.26 |
-| qb_streamer | 5.17 | 8.62 | 10.51 |
-| robust_rb | 5.28 | 7.73 | 9.91 |
-| balanced | 4.94 | 7.63 | 9.97 |
-| elite_te_early_qb | 4.84 | 7.25 | 9.36 |
-| early_qb | 4.84 | 6.93 | 9.10 |
-| backup_qb_hoard | 4.78 | 6.86 | 9.79 |
-| elite_qb_only | 4.39 | 6.74 | 8.62 |
-| hero_rb | 4.12 | 7.28 | 8.65 |
-| zero_rb | 3.78 | 5.80 | 6.91 |
+| qb_streamer | 4.73 | 8.31 | 10.02 |
+| late_qb | 5.67 | 7.87 | 9.95 |
+| balanced | 5.07 | 7.58 | 9.87 |
+| elite_te | 5.78 | 7.63 | 9.81 |
+| backup_qb_hoard | 5.30 | 7.04 | 9.68 |
+| robust_rb | 5.05 | 7.70 | 9.63 |
+| early_qb | 4.77 | 7.21 | 9.47 |
+| elite_te_early_qb | 4.92 | 7.50 | 9.28 |
+| elite_qb_only | 5.13 | 7.50 | 8.90 |
+| hero_rb | 4.41 | 7.15 | 8.74 |
+| zero_rb | 4.23 | 6.45 | 7.81 |
 
 Two comparisons matter:
 
-- Spread **across strategies**, holding effort at active: **3.60** points.
-- Spread **across effort levels**, averaged within a strategy: **4.47** points.
+- Spread **across strategies**, holding effort at active: **2.21** points.
+- Spread **across effort levels**, averaged within a strategy: **4.37** points.
 
-Effort is the larger effect even measured this way, and unlike strategy it
-never changes sign. The three best strategy-by-effort cells in every one of the
-five seasons belong to active managers — fifteen out of fifteen — while the
-strategy occupying those cells changes completely, from Zero RB in 2018 to
-Robust RB in 2025.
+Effort is now *twice* the larger effect measured this way — the strategy
+spread shrank with more seasons while the effort spread held — and unlike
+strategy it never changes sign. Of the three best strategy-by-effort cells in
+each of the seven seasons, **nineteen of twenty-one belong to active
+managers**, while the strategy occupying them changes completely, from Zero RB
+in 2018 to Robust RB in 2025.
 
-Zero RB gains least from activity (3.13 against a 4.47 average). A structural
+Zero RB gains least from activity (3.58 against a 4.37 average). A structural
 hole at a position with two starting slots and a flex is not something the
 waiver wire repairs.
 
-## 8. August cannot see the season. The first month can.
+## 8. August cannot see the season. The first month can — less clearly than we first claimed.
 
 Section 4 established that nothing observable before the draft predicts how a
 season will pay off. That is only half the question, because the draft is not
 the last decision a manager makes.
 
-Measuring the same RB-minus-WR payoff over different windows:
+The same RB-minus-WR payoff, per game, over different windows:
 
-| season | weeks 1–4 | weeks 1–6 | rest of season |
+| season | weeks 1–6 | rest of season | rest, among players still healthy at week 6 |
 |---|---|---|---|
-| 2018 | −3.03 | −2.65 | −1.98 |
-| 2019 | −1.56 | −0.45 | +0.60 |
-| 2023 | −2.36 | −2.64 | −1.88 |
-| 2024 | +3.15 | +1.73 | +3.77 |
-| 2025 | +1.57 | +1.03 | +1.59 |
+| 2018 | −2.65 | −1.98 | −0.66 |
+| 2019 | −0.45 | +0.60 | −0.34 |
+| 2021 | +0.73 | −0.71 | −1.06 |
+| 2022 | −1.86 | +0.05 | +1.23 |
+| 2023 | −2.64 | −1.88 | −1.08 |
+| 2024 | +1.73 | +3.77 | +6.42 |
+| 2025 | +1.03 | +1.59 | +1.60 |
 
-- Weeks 1–4 against the rest of the season: **r = +0.95**
-- Weeks 1–6 against the rest of the season: **r = +0.98**
+| correlation with rest of season | five seasons | seven seasons | significant at n=7 |
+|---|---|---|---|
+| all early picks | +0.98 | **+0.83** | yes (t = 3.29, crit 2.57) |
+| only players healthy at week 6 | +0.84 | **+0.62** | **no** (t = 1.76) |
 
-The obvious objection is that this is injury carry-over — a player who is out
-in week 2 is still out in week 10, so the same absences appear on both sides.
-So we recomputed the back half using **only players who were still healthy at
-week 6**, which removes that path entirely. The correlation is **+0.84**.
+**Two corrections to the five-season version of this section.**
 
-So the signal is real and not merely mechanical, on five seasons. The quantity
-that decides which draft strategy wins is invisible in August and largely
-resolved by early October.
+First, the headline correlation falls from +0.98 to +0.83 once 2021 and 2022
+are included. It is still significant, and still far better than anything
+available in August — but +0.98 rested on five points and should not have been
+quoted without that caveat.
 
-That asymmetry is the strongest practical claim this project can make, and it
-points at a behaviour none of the eleven playbooks implements: **draft without a
-positional thesis, then let the first month tell you what kind of season it is
-and reallocate accordingly.** Section 9 tests it.
+Second, and more seriously: the healthy-players-only figure was presented as
+evidence that the signal is "not merely injury carry-over." **It never reached
+significance, at either sample size** — t = 2.64 against a critical value of
+3.18 at n=5, and t = 1.76 against 2.57 at n=7. It is positive both times, which
+is suggestive, but it was written as though it disposed of the objection and it
+does not. 2021 and 2022 pull in opposite directions on this control. The honest
+position is that the early-season signal is real, and that we have **not** ruled
+out that much of it is season-ending injuries becoming visible early.
+
+That matters less practically than it sounds. If a player's season ends in
+week 3, learning it in week 4 is genuinely actionable about weeks 7 to 17 —
+that is a mechanism, not an artifact. But it is a narrower claim than "the
+positional shape of a season is legible by October," and the narrower claim is
+what the data supports.
+
+The August-versus-October asymmetry survives either way, and it points at a
+behaviour none of the eleven playbooks implements: **draft without a positional
+thesis, then let the first month tell you what kind of season it is and
+reallocate accordingly.** Section 9 tests it.
+
 
 ## 9. Testing two behaviours: the rebalancer and the run-aware drafter
 
@@ -606,6 +692,10 @@ returns zeros before week 4 and never looks forward.
 
 Tested the strongest way the simulator allows: identical league seeds, one team
 forced into the behaviour, compared against that same team's own default.
+
+**These two sections remain five-season results.** The counterfactual runs for
+2021 and 2022 have not been done, so the behaviour tests below cover 2018,
+2019, 2023, 2024 and 2025 only, while the rest of this report covers seven.
 
 | season | points/season | 95% CI | titles | playoffs |
 |---|---|---|---|---|
@@ -702,36 +792,84 @@ carried no information. Five seasons say half of that is right.
 
 Championship rate by slot, fair share 8.33%:
 
-| slot | 2018 | 2019 | 2023 | 2024 | 2025 | mean |
-|---|---|---|---|---|---|---|
-| 1 | 6.72 | 8.20 | 10.50 | 2.64 | 7.94 | 7.20 |
-| 2 | 6.72 | 9.44 | 8.02 | 3.10 | 9.20 | 7.30 |
-| 3 | 6.24 | 11.06 | 7.54 | 4.32 | 8.84 | 7.60 |
-| 4 | 7.02 | 10.92 | 7.08 | 6.02 | 6.14 | 7.44 |
-| 5 | 7.82 | 7.56 | 6.96 | 8.04 | 5.70 | 7.22 |
-| 6 | 8.88 | 4.94 | 5.42 | 9.10 | 5.38 | 6.74 |
-| 7 | 9.74 | 4.70 | 5.96 | 9.60 | 8.02 | 7.60 |
-| 8 | 9.92 | 5.52 | 6.32 | 11.04 | 8.58 | 8.28 |
-| 9 | 9.24 | 6.76 | 7.88 | 11.72 | 8.92 | 8.90 |
-| 10 | 8.86 | 8.78 | 9.24 | 10.90 | 10.60 | 9.68 |
-| 11 | 9.50 | 11.18 | 12.14 | 11.58 | 10.98 | 11.08 |
-| 12 | 9.34 | 10.94 | 12.94 | 11.94 | 9.70 | 10.97 |
+| slot | 2018 | 2019 | 2021 | 2022 | 2023 | 2024 | 2025 | mean |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 6.72 | 8.20 | 7.56 | 8.34 | 10.50 | 2.64 | 7.94 | 7.41 |
+| 2 | 6.72 | 9.44 | 7.74 | 8.96 | 8.02 | 3.10 | 9.20 | 7.60 |
+| 3 | 6.24 | 11.06 | 7.20 | 8.22 | 7.54 | 4.32 | 8.84 | 7.63 |
+| 4 | 7.02 | 10.92 | 6.92 | 8.22 | 7.08 | 6.02 | 6.14 | 7.47 |
+| 5 | 7.82 | 7.56 | 7.38 | 8.14 | 6.96 | 8.04 | 5.70 | 7.37 |
+| 6 | 8.88 | 4.94 | 7.60 | 7.54 | 5.42 | 9.10 | 5.38 | 6.98 |
+| 7 | 9.74 | 4.70 | 7.76 | 8.54 | 5.96 | 9.60 | 8.02 | 7.76 |
+| 8 | 9.92 | 5.52 | 8.02 | 7.84 | 6.32 | 11.04 | 8.58 | 8.18 |
+| 9 | 9.24 | 6.76 | 8.96 | 8.26 | 7.88 | 11.72 | 8.92 | 8.82 |
+| 10 | 8.86 | 8.78 | 9.16 | 9.26 | 9.24 | 10.90 | 10.60 | 9.54 |
+| 11 | 9.50 | 11.18 | 10.34 | 8.48 | 12.14 | 11.58 | 10.98 | 10.60 |
+| 12 | 9.34 | 10.94 | 11.36 | 8.20 | 12.94 | 11.94 | 9.70 | 10.63 |
 
 **Still right:** any one season's pattern is that season. Slot 1 won 2.64% of
 titles in 2024, when Christian McCaffrey was the first pick and missed nine
 games, and 10.50% in 2023.
 
 **Now wrong:** that slot carries no information at all. Slots 11 and 12 finish
-above fair share in all five seasons — ten results out of ten — and the middle
-of the snake is consistently the worst place to sit, slot 6 averaging 6.74%.
+above fair share in **thirteen of fourteen** season-slots (2022's slot 12, at
+8.20%, is the lone miss), and the middle of the snake is consistently the worst
+place to sit, slot 6 averaging 6.98%. Back four 10.26% against front four
+7.52%.
 The ends of a snake draft take their picks in pairs; the middle never does.
 
 We ruled out an assignment bug: personas and activity levels are distributed
 across all twelve slots to within 1.7 percentage points, consistent with
 sampling noise at 5,000 leagues per slot.
 
-**What we have not established is the mechanism.** The effect is clear in
-championships and inconsistent in scoring — the back of the draft outscores the
-front in three of five seasons and loses in two (+53, −18, −19, +52, +17). A
-mechanism that always moves titles but only sometimes moves points is not one we
-understand. Five seasons is enough to notice this and not enough to explain it.
+**The mechanism is clearer than it was, but still not established.** With two
+more seasons the back of the draft outscores the front in **five of seven**
+(+51, −19, +30, +19, −27, +70, +17), where at five seasons it was three of
+five. So the scoring story is firmer than before and still not unanimous. A
+mechanism that always moves titles but only usually moves points is not one we
+can claim to understand. Seven seasons is enough to be confident the effect is
+real, and not enough to explain it.
+
+## 11. Is the fallback data tier trustworthy?
+
+2021 and 2022 are the only two seasons built without ESPN projections. Since
+this report's entire subject is season-to-season differences, a difference in
+data source would be a nasty confound — it could be read as a season effect.
+
+So the tiers were compared directly on a season where both exist. 2024 was
+rebuilt with its ESPN file hidden, producing a 621-player universe from
+nflverse box scores and FantasyPros consensus instead of the usual 667-player
+ESPN build, and re-simulated on the same 5,000 league seeds.
+
+| strategy | tier 1 (ESPN) | tier 2 (nflverse + FantasyPros) |
+|---|---|---|
+| robust_rb | +0.25 (1st) | +0.15 (1st) |
+| elite_qb_only | +0.13 (2nd) | +0.15 (2nd) |
+| early_qb | +0.10 (3rd) | +0.13 (3rd) |
+| balanced | +0.08 (4th) | +0.05 (5th) |
+| backup_qb_hoard | +0.07 (5th) | +0.07 (4th) |
+| late_qb | +0.03 (6th) | +0.04 (6th) |
+| qb_streamer | +0.01 (7th) | +0.01 (7th) |
+| elite_te | −0.08 (8th) | −0.02 (9th) |
+| elite_te_early_qb | −0.12 (9th) | −0.00 (8th) |
+| hero_rb | −0.28 (10th) | −0.25 (10th) |
+| zero_rb | −0.40 (11th) | −0.40 (11th) |
+
+- Rank agreement between tiers: **+0.982**
+- Mean absolute difference in standing: **0.036**
+- Only two rank changes, both adjacent swaps; top three and bottom two identical
+
+The benchmark that matters is the within-season split-half ceiling from
+Section 2: **+0.92**. The two data sources agree with each other *more closely
+than a season agrees with itself*. The projection source is therefore not a
+meaningful confound for the question this report asks, and 2021 and 2022 are
+included on that basis.
+
+This does not mean the tiers are interchangeable for every purpose. It means
+the *ordering of strategies within a season* — the only quantity the
+cross-season analysis consumes — survives the source change. A claim about a
+specific player's projected points would not inherit that guarantee.
+
+The run behind this is kept at `results/2024_tier2`, and every season's
+`meta_*.json` records its `tier` and `espn_file_present`, so the distinction
+cannot be silently lost downstream.
